@@ -1,0 +1,136 @@
+#include "HelloWorldScene.h"
+
+USING_NS_CC;
+
+Scene* HelloWorld::createScene()
+{
+    return HelloWorld::create();
+}
+
+bool HelloWorld::init()
+{
+
+    // initailize the father class.
+    if ( !Scene::init() )
+    {
+        return false;
+    }
+
+    auto audio = CocosDenshion::SimpleAudioEngine::getInstance();
+    audio->playBackgroundMusic("music/Olimpica.mp3", true);
+
+    auto const visibleSize = Director::getInstance()->getVisibleSize();
+    Vec2 const origin = Director::getInstance()->getVisibleOrigin();
+
+    // add a "close" icon to exit the progress. it's an autorelease object
+    auto closeItem = MenuItemImage::create(
+        "icon/PowerNormal.png",
+        "icon/PowerSelected.png",
+        CC_CALLBACK_1(HelloWorld::menuCloseCallback, this));
+
+    if (closeItem == nullptr ||
+        closeItem->getContentSize().width <= 0 ||
+        closeItem->getContentSize().height <= 0)
+    {
+        problemLoading("'icon/PowerNormal.png' and 'icon/PowerSelected.png'");
+    }
+    else
+    {
+       float const x = origin.x + visibleSize.width - closeItem->getContentSize().width/2;
+       float const y = origin.y + closeItem->getContentSize().height/2;
+       closeItem->setPosition(Vec2(x,y));
+    }
+
+    // create menu, it's an autorelease object
+    auto menuClose = Menu::create(closeItem, NULL);
+    menuClose->setPosition(Vec2::ZERO);
+    this->addChild(menuClose, 1);
+
+    // add a "start" menu.
+    auto startItem = MenuItemImage::create(
+        "button/StartNormal.png",
+        "button/StartSelected.png",
+        CC_CALLBACK_1(HelloWorld::menuStartCallback, this));
+
+    if (startItem == nullptr ||
+        startItem->getContentSize().width <= 0 ||
+        startItem->getContentSize().height <= 0)
+    {
+        problemLoading("button/StartNormal.png and button/StartSelected.png");
+    }
+    else
+    {
+        float const x = origin.x + visibleSize.width / 2;
+        float const y = origin.y + visibleSize.height / 5;
+        startItem->setPosition(Vec2(x, y));
+    }
+
+    auto menuStart = Menu::create(startItem, NULL);
+    menuStart->setPosition(Vec2::ZERO);
+    this->addChild(menuStart, 2);
+
+    // create and initialize a label
+    auto label = Label::createWithTTF("GemMatch!", "fonts/FZCHSJW.ttf", 40);
+    if (label == nullptr)
+    {
+        problemLoading("'fonts/FZCHSJW.ttf'");
+    }
+    else
+    {
+        label->setPosition(Vec2(origin.x + visibleSize.width/2,
+                                origin.y + visibleSize.height - 4*(label->getContentSize().height )));
+        label->setColor(Color3B::Color3B(89, 91, 179));
+
+        // add the label as a child to this layer
+        this->addChild(label, 1);
+    }
+
+    // add background
+    auto background = Sprite::create("Background.png");
+    if (background == nullptr)
+    {
+        problemLoading("Background.png");
+    }
+    else
+    {
+        background->setPosition(Vec2::ZERO);
+        this->addChild(background, -1);
+    }
+
+    // add a logo on the center.
+    auto sprite = Sprite::create("HelloWorld.png");
+    if (sprite == nullptr)
+    {
+        problemLoading("'HelloWorld.png'");
+    }
+    else
+    {
+        // position the sprite on the center of the screen
+        auto delay = DelayTime::create(kTransitionTime);
+        auto dwindle = ScaleBy::create(1, 0.25f, 0.25f);
+        sprite->setPosition(Vec2(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y));
+        auto seq = Sequence::create(delay, dwindle,nullptr);
+        sprite->runAction(seq);
+
+        this->addChild(sprite, 0);
+    }
+    return true;
+}
+
+
+void HelloWorld::menuStartCallback(Ref* pSender)
+{
+    auto scene = LevelSelect::createScene();
+    Director::getInstance()->replaceScene(TransitionMoveInR::create(kTransitionTime, scene));
+}
+
+void HelloWorld::menuCloseCallback(Ref* pSender)
+{
+    //Close the cocos2d-x game scene and quit the application
+    Director::getInstance()->end();
+
+    //To navigate back to native iOS screen(if present) without quitting the application 
+    //instead trigger a custom event created in RootViewController.mm as below
+    //EventCustom customEndEvent("game_scene_close_event");
+    //_eventDispatcher->dispatchEvent(&customEndEvent);
+}
