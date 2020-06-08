@@ -1,10 +1,11 @@
 #include "GameScene.h"
 
+// a simple GameScene constructor
 GameScene::GameScene() noexcept
+	: m_gamemode(Steps)
 {
 	m_isAction = false;m_isFillSprite = false;
 	m_enableOperation = true;
-	m_gamemode = Steps;
 	m_difficulty = 1;m_time = 0;m_steps = 0,m_score = 0;
 	m_startSprite = nullptr; m_endSprite = nullptr;
 }
@@ -22,6 +23,8 @@ bool GameScene::init()
 	}
 	else
 	{
+		// temporary game settings
+		// should be set in SettingScene in the future
 		m_cols = 6; m_rows = 8;
 		m_steps = 5,m_difficulty = 5;
 
@@ -37,6 +40,7 @@ bool GameScene::init()
 			this->addChild(background, -20);
 		}
 	
+		// add touch listener of the touch action
 		auto touchListener = EventListenerTouchOneByOne::create();
 		touchListener->onTouchBegan = 
 			CC_CALLBACK_2(GameScene::touchBeganCallback, this);
@@ -45,15 +49,19 @@ bool GameScene::init()
 		_eventDispatcher->addEventListenerWithSceneGraphPriority(
 			touchListener, this);
 
+		// initialize all needed elements
 		initMap();
 		initLimit();
 		initScorer();
+
+		// schedule update func to check matchs and refresh
 		scheduleUpdate();
 
 		return true;
 	}
 }
 
+// create sprites for first entering randomly
 void GameScene::initMap()
 {
 	setBlockOriginPosition();
@@ -72,6 +80,7 @@ void GameScene::createSprite(int row,int col,int index)
 	SpriteShape* sprite = SpriteShape::create(row, col, index);
 	CCASSERT(sprite, "Null Pointer!");
 
+	// confirm the position and set animation for dropped sprites
 	Point const endPosition = positionOfItem(row, col);
 	Point const startPosition = positionOfAnimateItem(endPosition);
 	float const speed = startPosition.y / (1 * kDesignResolutionHeight);
@@ -79,9 +88,11 @@ void GameScene::createSprite(int row,int col,int index)
 	sprite->setPosition(startPosition);
 	sprite->runAction(MoveTo::create(speed, endPosition));
 	this->addChild(sprite,0);
+	// store the sprite into map for further searching
 	m_blocks.insert(BlockPair(Point(row, col),sprite));
 }
 
+// add limitation for playability according to selected gamemode
 void GameScene::initLimit()
 {
 	TTFConfig config("fonts/MFShangZhen.ttf", 25);
@@ -152,6 +163,7 @@ void GameScene::update(float dt)
 		for (int row = 0; row < getRows(); row++)
 			for (int col = 0; col < getCols(); col++)
 			{
+				// traverse all sprites to make sure are there running actions
 				sprite = findSprite(row, col);
 				if (sprite != nullptr && sprite->getNumberOfRunningActions() > 0)
 				{
@@ -205,12 +217,14 @@ void GameScene::checkAndRemove()
 				continue;
 
 			// check cols and rows depart
+			// store match sprite in the list
 			std::list<SpriteShape*> colChain;
 			colCheck(sprite, colChain);
 			std::list<SpriteShape*> rowChain;
 			rowCheck(sprite, rowChain);
 
 			// take the longest matches to process
+			// and there are different types for the match and special sprites
 			if (colChain.size() < 3 && rowChain.size() < 3)
 			{
 				continue;
@@ -231,6 +245,7 @@ void GameScene::checkAndRemove()
 
 			}
 		}
+	// begin to remove after marking
 	removeSprite();
 }
 
@@ -245,6 +260,8 @@ void GameScene::markRemove (SpriteShape* sprite) noexcept
 		sprite->setIsNeedRemove(true);
 }
 
+// distinguish the types of remove and 
+// transfer them to explode func to actualize whole row/col clear
 void GameScene::removeSprite()
 {
 	m_isAction = true;
@@ -268,9 +285,9 @@ void GameScene::removeSprite()
 		}
 }
 
+// remove single sprites and play animation for disappearing
 void GameScene::explodeSprite(SpriteShape* sprite)
 {
-	
 	if (sprite == nullptr)
 		return;
 	auto explodeSpawn = Spawn::createWithTwoActions(
@@ -280,6 +297,7 @@ void GameScene::explodeSprite(SpriteShape* sprite)
 	sprite->runAction(explodeSequence);
 }
 
+
 void GameScene::colCheck(SpriteShape* sprite, std::list<SpriteShape*>& colChain)
 {
 	// checkAndRemove() makes sure that sprite is not nullptr
@@ -287,6 +305,7 @@ void GameScene::colCheck(SpriteShape* sprite, std::list<SpriteShape*>& colChain)
 	
 	SpriteShape* neighbourSprite = nullptr;
 
+	// left hand search
 	for (int neighbourCol = sprite->getCol() - 1; 
 			neighbourCol >= 0; neighbourCol--)
 	{
@@ -302,7 +321,7 @@ void GameScene::colCheck(SpriteShape* sprite, std::list<SpriteShape*>& colChain)
 			break;
 		}
 	}
-
+	// right hand search
 	for (int neighbourCol = sprite->getCol() + 1;
 		neighbourCol < getCols(); neighbourCol++)
 	{
@@ -327,6 +346,7 @@ void GameScene::rowCheck(SpriteShape* sprite, std::list<SpriteShape*>& rowChain)
 	rowChain.push_back(sprite);
 	SpriteShape* neighbourSprite = nullptr;
 
+	// downward search
 	for (int neighbourRow = sprite->getRow() -  1;
 		neighbourRow >= 0; neighbourRow--)
 	{
@@ -342,7 +362,7 @@ void GameScene::rowCheck(SpriteShape* sprite, std::list<SpriteShape*>& rowChain)
 			break;
 		}
 	}
-	
+	// upwards sreach
 	for (int neighbourRow = sprite->getRow() +1;
 		neighbourRow < getRows(); neighbourRow++)
 	{
@@ -372,6 +392,7 @@ void GameScene::fillSprite()
 		{
 			sprite = findSprite(row, col);
 			if (sprite == nullptr)
+				// record the num of removed sprite in a single col
 				removedCounter++;
 			else
 			{
@@ -393,9 +414,11 @@ void GameScene::fillSprite()
 			}
 		}
 		colEmptyNum.push_back(removedCounter);
+		// calculate and refresh the game score
 		scorer(removedCounter);
 	}
 	
+	// create new sprites randomly to fill in the blanks
 	int index = 0;
 	srand(time(0));
 	for (int col = 0; col < getCols(); col++)
@@ -427,6 +450,9 @@ void GameScene::swapSprite()
 
 }
 
+// invoked when user swap tow sprites and play animations
+// judge whether they could come into being new matches
+// remain sawp if could while return to origin if could not
 bool GameScene::swapMatch()
 {
 	m_isAction = true;
@@ -472,6 +498,8 @@ bool GameScene::swapMatch()
 	return false;
 }
 
+// mainly designed to identify the special sprites and refresh
+// the ignorance, isneedremove and particle effcts
 void GameScene::processMatch(std::list<SpriteShape*>
 	& matchList,SpriteStatus matchType)
 {
@@ -517,6 +545,8 @@ void GameScene::processMatch(std::list<SpriteShape*>
 	}
 }
 
+
+// limitation by remaining time
 void GameScene::timer(float dt)
 {
 	m_time--;
@@ -550,6 +580,7 @@ void GameScene::scorer(int num)
 
 }
 
+// limitation by remaining steps
 void GameScene::pedometer()
 {
 	m_steps--;
@@ -571,6 +602,7 @@ void GameScene::pedometer()
 
 }
 
+// replace to gameover scene
 void GameScene::gameOver(float dt)
 {
 	auto scene = GameOver::create();
@@ -582,6 +614,8 @@ void GameScene::gameOver(float dt)
 
 void GameScene::explodeHorizontal(SpriteShape* sprite)
 {
+	
+	// play the particle effects for horizontal clear
 	auto explodeParticle = CCParticleSystemQuad::create(
 		"plist/ExplodeHorizon.plist");
 	explodeParticle->setPosition(0,sprite->getPosition().y);
@@ -672,6 +706,7 @@ void GameScene::actionEndCallback(Node* node)
 	SpriteShape* sprite = 
 		dynamic_cast<SpriteShape*>(node);
 	m_blocks.erase(Point(sprite->getRow(), sprite->getCol()));
+	// sprite are finally destroyed here
 	sprite->removeFromParent();
 }
 
@@ -696,6 +731,7 @@ void GameScene::touchEndCallback(Touch* touch, Event* event)
 		return;
 	}
 
+	// check the direction the user pointed to
 	int row = m_startSprite->getRow();
 	int col = m_startSprite->getCol();
 	Point location = touch->getLocation();
