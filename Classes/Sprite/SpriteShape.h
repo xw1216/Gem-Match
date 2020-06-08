@@ -17,12 +17,12 @@ public:
 			{ return m_isNeedRemove; }
 	void setIsNeedRemove(bool boolean) noexcept
 			{ m_isNeedRemove = boolean; }
-	bool getIsIgored() { return m_isIgnored; }
-	void setIsIgnored(bool isIgnored) { m_isIgnored = isIgnored; }
+	bool getIsIgored() noexcept { return m_isIgnored; }
+	void setIsIgnored(bool isIgnored) noexcept { m_isIgnored = isIgnored; }
 
-	SpriteStatus getStatus() { return m_status; }
-	void setStatus(SpriteStatus status);
-	ParticleSystem* getParticle() { return m_particle; };
+	SpriteStatus getStatus() noexcept { return m_status; }
+	void setStatus(SpriteStatus status) ;
+	CCParticleSystemQuad* getParticle() { return m_particle; }
 
 	CC_SYNTHESIZE(int, m_row, Row);
 	CC_SYNTHESIZE(int, m_col, Col);
@@ -32,7 +32,7 @@ private:
 	bool m_isNeedRemove;
 	bool m_isIgnored;
 	SpriteStatus m_status;
-	ParticleSystem * m_particle;
+	CCParticleSystemQuad* m_particle;
 
 };
 #endif // ! __SPRITE_SHAPE__
