@@ -14,6 +14,9 @@ class GameScene : public cocos2d::Scene
 public:
 	typedef std::map <Point, SpriteShape* > BlockMap;
 	typedef std::pair<Point, SpriteShape*> BlockPair;
+	
+	// three game mode are designed 
+	// and could be selected in levelselect
 	enum GameMode{Steps,Times,Creative};
 
 	GameScene() noexcept;
@@ -27,6 +30,8 @@ public:
 	void createSprite(int row, int col,int index);
 	void initLimit();
 	void initScorer();
+
+	// calculate the position of the drop blocks and existing blocks
 	Point positionOfAnimateItem(Point point);
 	Point positionOfItem(int row, int col);
 
@@ -34,13 +39,18 @@ public:
 	void update(float dt);
 
 	// running blocks check
+	// check matchs and remove sprites
 	void checkAndRemove();
 	void markRemove  (SpriteShape* sprite) noexcept;
 	void removeSprite();
 	void explodeSprite(SpriteShape* sprite);
 	void colCheck(SpriteShape* sprite, std::list< SpriteShape*>& colChain);
 	void rowCheck(SpriteShape* sprite, std::list< SpriteShape*>& rowChain);
+	// fill in the blanks of the removed sprites
 	void fillSprite();
+
+	// response when user exchange blocks
+	// then check and process match
 	void swapSprite();
 	bool swapMatch();
 	void processMatch(std::list<SpriteShape*> 
@@ -50,7 +60,11 @@ public:
 	void timer(float dt);
 	void scorer(int num);
 	void pedometer();
+
+	// replace scene to gameover
 	void gameOver(float dt);
+
+	// impletation of the row or col clear sprite
 	void explodeHorizontal(SpriteShape* sprite);
 	void explodeVertical(SpriteShape* sprite);
 
@@ -72,19 +86,27 @@ public:
 	CC_SYNTHESIZE(int, m_cols, Cols);
 
 private:
+	// instance status varieble, used in frame update
 	bool m_isAction;
 	bool m_isFillSprite;
 	bool m_enableOperation;
 	
+	// game setting data
+	// user can customize them in the future
 	GameMode m_gamemode;
 	int m_difficulty;
 	int m_steps;
 	int m_time;
 	int m_score;
 
+	// data to identify the swap and special sprites
 	SpriteShape* m_startSprite, * m_endSprite;
 
+	// the origin point of the blocks map 
+	// can be revised based on the number of rows and cols
 	Point m_blockOrigin;
+
+	// store all of the existing sprites
 	BlockMap m_blocks;
 };
 
