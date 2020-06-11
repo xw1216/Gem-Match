@@ -32,7 +32,7 @@ bool HelloWorld::init()
         closeItem->getContentSize().width <= 0 ||
         closeItem->getContentSize().height <= 0)
     {
-        problemLoading("'icon/PowerNormal.png' and 'icon/PowerSelected.png'");
+        problemLoading("'icon/Power.png' and 'icon/Power.png'");
     }
     else
     {
