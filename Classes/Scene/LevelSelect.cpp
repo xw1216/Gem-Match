@@ -46,10 +46,10 @@ bool LevelSelect::init()
 
 		// add game menu
 		auto gameItem = MenuItemImage::create(
-			"icon/PowerNormal.png", "icon/PowerNormal.png",
+			"icon/Power.png", "icon/Power.png",
 			CC_CALLBACK_1(LevelSelect::gameStartCallback, this));
 		if (gameItem == nullptr)
-			problemLoading("icon/Confirm.png");
+			problemLoading("icon/Power.png");
 		else
 		{
 			float const x = origin.x + visibleSize.width / 2;

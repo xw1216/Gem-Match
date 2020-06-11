@@ -2,6 +2,7 @@
 #define __GAME_DEFINE__
 
 #include "cocos2d.h"
+#include "SimpleAudioEngine.h"
 
 // The default resolution of the game
 constexpr int kDesignResolutionWidth = 540;
@@ -13,6 +14,7 @@ constexpr int kSpriteWidth = 80,
 
 constexpr int kBorderWidth = 4;
 constexpr float kTransitionTime = 0.75;
+constexpr float kBlockSwapTime = 0.25;
 
 // The image of all blocks
 constexpr char* spriteNormal[kSpriteNum] =
@@ -22,5 +24,7 @@ constexpr char* spriteNormal[kSpriteNum] =
 	"BlockG.png","BlockH.png","BlockI.png",
 	"BlockJ.png","BlockK.png","BlockL.png"
 };
+
+enum SpriteStatus { Normal = 0, Horizontal, Vertical };
 
 #endif // !__GAME_DEFINE__
