@@ -24,8 +24,11 @@ bool HelloWorld::init()
 
 	if (CCUserDefault::sharedUserDefault()->getIntegerForKey(MUSIC_KEY))
 	{
+		float percent = UD_getInt("musicPercent");
 		auto audio = CocosDenshion::SimpleAudioEngine::getInstance();
 		audio->playBackgroundMusic("music/Olimpica.mp3", true);
+		audio->setBackgroundMusicVolume(percent/100.0);
+		UD_setFloat("musicPercent", percent);
 	}
 
 

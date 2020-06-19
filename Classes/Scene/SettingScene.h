@@ -6,6 +6,7 @@
 #include "LevelSelect.h"
 #include "GameDefine.h"
 #include "SimpleAudioEngine.h"
+#include "ui/CocosGUI.h"
 
 
 USING_NS_CC;
@@ -21,6 +22,7 @@ public:
 	void menuBackCallback(Ref* pSender);
 	void menuBackHomeCallback(Ref* pSender);
 	void audioMuteCallback(Ref* pSender);
+	void SliderCallBack(Ref* pSender);
 
 	void  problemLoading(const char* filename) noexcept
 	{

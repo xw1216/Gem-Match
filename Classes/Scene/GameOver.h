@@ -13,6 +13,7 @@ struct Player
 {
 	std::string name;
 	int score;
+	std::string mode;
 };
 
 class GameOver : public cocos2d::Scene
@@ -25,6 +26,7 @@ public:
 
 	void setScore(int score) noexcept;
 	void getScore(int score) { finalScore = score; };
+	void setcurrentmode(int modetyoe);
 
 	void levelSelectBackCallback(Ref* pSender);
 	void gameStartCallback(Ref* pSender);
@@ -40,6 +42,7 @@ private:
 	TextFieldTTF* textEdit;
 	int finalScore;
 	Player p[max_range + 1];
+	std::string current_mode;
 };
 
 
