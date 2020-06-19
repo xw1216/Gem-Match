@@ -1,6 +1,8 @@
 #include "HelloWorldScene.h"
 
+
 USING_NS_CC;
+
 
 Scene* HelloWorld::createScene()
 {
@@ -16,11 +18,17 @@ bool HelloWorld::init()
         return false;
     }
 
-    auto audio = CocosDenshion::SimpleAudioEngine::getInstance();
-    audio->playBackgroundMusic("music/Olimpica.mp3", true);
+	auto const visibleSize = Director::getInstance()->getVisibleSize();
+	Vec2 const origin = Director::getInstance()->getVisibleOrigin();
 
-    auto const visibleSize = Director::getInstance()->getVisibleSize();
-    Vec2 const origin = Director::getInstance()->getVisibleOrigin();
+
+	if (CCUserDefault::sharedUserDefault()->getIntegerForKey(MUSIC_KEY))
+	{
+		auto audio = CocosDenshion::SimpleAudioEngine::getInstance();
+		audio->playBackgroundMusic("music/Olimpica.mp3", true);
+	}
+
+
 
     // add a "close" icon to exit the progress. it's an autorelease object
     auto closeItem = MenuItemImage::create(
@@ -85,17 +93,17 @@ bool HelloWorld::init()
         this->addChild(label, 1);
     }
 
-    // add background
-    auto background = Sprite::create("Background.png");
-    if (background == nullptr)
-    {
-        problemLoading("Background.png");
-    }
-    else
-    {
-        background->setPosition(Vec2::ZERO);
-        this->addChild(background, -1);
-    }
+	//add background
+	auto HelloBack = Sprite::create("Hello_background.jpg");
+	if (HelloBack == nullptr)
+	{
+		problemLoading("Hello_Back.png");
+	}
+	else
+	{
+		HelloBack->setPosition(Vec2(kDesignResolutionWidth / 2, kDesignResolutionHeight / 2));
+		this->addChild(HelloBack, -20);
+	}
 
     // add a logo on the center.
     auto sprite = Sprite::create("HelloWorld.png");
@@ -114,18 +122,38 @@ bool HelloWorld::init()
 
         this->addChild(sprite, 0);
     }
+
+	//add settin button
+	auto settingItem = MenuItemImage::create(
+		"icon/setting.png", "icon/setting.png",
+		CC_CALLBACK_1(HelloWorld::menuSettingCallback, this));
+	if (settingItem == nullptr)
+		problemLoading("'icon/setting.png', 'icon/setting.png'");
+	else
+	{
+		float const x = settingItem->getContentSize().width;
+		float const y = origin.y + settingItem->getContentSize().height;
+		settingItem->setPosition(Vec2(x, y));
+		auto homeMenu = Menu::create(settingItem, NULL);
+		homeMenu->setPosition(Vec2::ZERO);
+		this->addChild(homeMenu, 1);
+	}
     return true;
 }
 
 
 void HelloWorld::menuStartCallback(Ref* pSender)
 {
+	auto audio = CocosDenshion::SimpleAudioEngine::getInstance();
+	audio->playEffect("music/normalclick.mp3", false);
     auto scene = LevelSelect::createScene();
     Director::getInstance()->replaceScene(TransitionMoveInR::create(kTransitionTime, scene));
 }
 
 void HelloWorld::menuCloseCallback(Ref* pSender)
 {
+	auto audio = CocosDenshion::SimpleAudioEngine::getInstance();
+	audio->playEffect("music/normalclick.mp3", false);
     //Close the cocos2d-x game scene and quit the application
     Director::getInstance()->end();
 
@@ -133,4 +161,12 @@ void HelloWorld::menuCloseCallback(Ref* pSender)
     //instead trigger a custom event created in RootViewController.mm as below
     //EventCustom customEndEvent("game_scene_close_event");
     //_eventDispatcher->dispatchEvent(&customEndEvent);
+}
+void HelloWorld::menuSettingCallback(cocos2d::Ref* pSender)
+{
+	auto audio = CocosDenshion::SimpleAudioEngine::getInstance();
+	audio->playEffect("music/normalclick.mp3", false);
+	auto scene = SettingScene::createScene();
+	Director::getInstance()->pushScene(TransitionMoveInR::create(kTransitionTime, scene));
+
 }

@@ -17,7 +17,7 @@ public:
 	
 	// three game mode are designed 
 	// and could be selected in levelselect
-	enum GameMode{Steps,Times,Creative};
+	enum GameMode{Steps=0,Times,Creative};
 
 	GameScene() noexcept;
 	// create related function
@@ -63,6 +63,7 @@ public:
 
 	// replace scene to gameover
 	void gameOver(float dt);
+	/*void rankList(float dt);*/
 
 	// impletation of the row or col clear sprite
 	void explodeHorizontal(SpriteShape* sprite);
@@ -75,8 +76,12 @@ public:
 	void setDifficulty(int num) noexcept { m_difficulty = num; }
 	void setBlockOriginPosition();
 	void  problemLoading(const char* filename) noexcept;
-
+	/*void setgamemode(int typemode) { m_gamemode = (GameMode)typemode; };
+	GameMode getgamemode() { return  m_gamemode; };*/
 	// callbacks
+
+	void menuSettingCallback(Ref* pSender);
+	void menuHomeCallback(Ref* pSender);
 	void actionEndCallback(Node* node);
 	bool touchBeganCallback(Touch* touch, Event* event);
 	void touchEndCallback(Touch* touch, Event* event);
@@ -90,6 +95,7 @@ private:
 	bool m_isAction;
 	bool m_isFillSprite;
 	bool m_enableOperation;
+
 	
 	// game setting data
 	// user can customize them in the future

@@ -5,6 +5,7 @@
 #include "LevelSelect.h"
 #include "GameDefine.h"
 #include "SimpleAudioEngine.h"
+#include "SettingScene.h"
 
 class HelloWorld : public cocos2d::Scene
 {
@@ -19,6 +20,7 @@ public:
     // selector callback
     void menuStartCallback(cocos2d::Ref* pSender);
     void menuCloseCallback(cocos2d::Ref* pSender);
+	void menuSettingCallback(cocos2d::Ref* pSender);
    
     void problemLoading(const char* filename) noexcept
     {

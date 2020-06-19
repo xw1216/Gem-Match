@@ -20,6 +20,7 @@ public:
 	// Selector Callback
 	void menuBackCallback(Ref* pSender);
 	void gameStartCallback(Ref* pSender);
+	void gamerankCallback(Ref* pSender);
 
 	void  problemLoading(const char* filename) noexcept
 	{
