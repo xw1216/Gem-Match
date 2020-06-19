@@ -2,7 +2,7 @@
 
 // a simple GameScene constructor
 GameScene::GameScene() noexcept
-	: m_gamemode(Times)
+	: m_gamemode(Steps)
 {
 	m_isAction = false;m_isFillSprite = false;
 	m_enableOperation = true;
@@ -26,13 +26,13 @@ bool GameScene::init()
 		// temporary game settings
 		// should be set in SettingScene in the future
 		m_cols = 6; m_rows = 8;
-		m_steps = 1, m_difficulty = 5; m_time = 20;
+		m_steps = 15, m_difficulty = 4; m_time = 20;
 		
 		// add background
 		auto background = Sprite::create("Back_Scene.png");
 		if (background == nullptr)
 		{
-			problemLoading("Background.png");
+			problemLoading("Back_Scene.png");
 		}
 		else
 		{
@@ -73,15 +73,29 @@ bool GameScene::init()
 			"icon/setting.png", "icon/setting.png",
 			CC_CALLBACK_1(GameScene::menuSettingCallback, this));
 		if (settingItem == nullptr)
-			problemLoading("'icon/setting.png', 'icon/setting.png'");
+			problemLoading("icon/setting.png lost.");
 		else
 		{
-			float const x = settingItem->getContentSize().width;
+			float const x = kDesignResolutionWidth - settingItem->getContentSize().width * 2;
 			float const y = settingItem->getContentSize().height;
 			settingItem->setPosition(Vec2(x, y));
-			auto homeMenu = Menu::create(settingItem, NULL);
-			homeMenu->setPosition(Vec2::ZERO);
-			this->addChild(homeMenu, 1);
+			auto settingMenu = Menu::create(settingItem, NULL);
+			settingMenu->setPosition(Vec2::ZERO);
+			this->addChild(settingMenu, 1);
+		}
+		//add pause button
+		auto pauseItem = MenuItemImage::create(
+			"icon/pause.png", "icon/pause.png",
+			CC_CALLBACK_1(GameScene::gamePauseCallback, this));
+		if (pauseItem == nullptr)
+			problemLoading("icon/pause.png lost.");
+		else
+		{
+			pauseItem->setPosition(Vec2(pauseItem->getContentSize().width,
+				pauseItem->getContentSize().height));
+			auto pauseMenu = Menu::create(pauseItem, NULL);
+			pauseMenu->setPosition(Vec2::ZERO);
+			this->addChild(pauseMenu, 1);
 		}
 		// schedule update func to check matchs and refresh
 		scheduleUpdate();
@@ -262,18 +276,21 @@ void GameScene::checkAndRemove()
 			}
 			else if (colChain.size() >= rowChain.size())
 			{
-				if (colChain.size() > 3)
+				if (colChain.size() == 4)
 					processMatch(colChain, Vertical);
+				else if (colChain.size() > 4)
+					processMatch(colChain, Global);
 				else
 					processMatch(colChain, Normal);
 			}
 			else
 			{
-				if (rowChain.size() > 3)
+				if (rowChain.size() == 4)
 					processMatch(rowChain, Horizontal);
+				else if (rowChain.size() > 4)
+					processMatch(rowChain, Global);
 				else
 					processMatch(rowChain, Normal);
-
 			}
 		}
 	// begin to remove after marking
@@ -310,6 +327,8 @@ void GameScene::removeSprite()
 					explodeVertical(sprite);
 				else if (sprite->getStatus() == Horizontal)
 					explodeHorizontal(sprite);
+				else if (sprite->getStatus() == Global)
+					explodeGlobal(sprite);
 				else
 					explodeSprite(sprite);
 			}
@@ -729,6 +748,29 @@ void GameScene::explodeVertical(SpriteShape* sprite)
 	audio->playEffect("music/HandV.mp3", false);
 }
 
+void GameScene::explodeGlobal(SpriteShape* sprite)
+{
+	auto explodeParticle = CCParticleSystemQuad::create(
+		"plist/ExplodeGlobal.plist");
+	explodeParticle->setPosition(sprite->getPosition());
+	explodeParticle->runAction(RotateBy::create(1, 3, 3));
+
+	explodeParticle->setAutoRemoveOnFinish(true);
+	this->addChild(explodeParticle, 1);
+
+
+	SpriteShape* otherSprite = nullptr;
+	auto index = sprite->getImageIndex();
+	for (int row = 0; row < getRows(); row++)
+		for (int col = 0; col < getCols(); col++)
+		{
+			otherSprite = findSprite(row, col);
+			if (otherSprite != nullptr)
+				if (index == otherSprite->getImageIndex())
+					explodeSprite(otherSprite);
+		}
+}
+
 SpriteShape* GameScene::findSprite(int row, int col)
 {
 	BlockMap::iterator iter;
@@ -854,6 +896,35 @@ void GameScene::menuHomeCallback(Ref* pSender)
 	auto scene = HelloWorld::createScene();
 	Director::getInstance()->replaceScene(scene);
 }
+
+void GameScene::gamePauseCallback(Ref* pSender)
+{
+	auto visibleSize = Director::getInstance()->getVisibleSize();
+	_eventDispatcher->pauseEventListenersForTarget(this, true);
+	Dialog* dialog = Dialog::create();
+	dialog->setTitle("Pause", 45);
+	dialog->setBackground("button/DialogBackground.png");
+	dialog->setContent("What to do?", 40);
+	dialog->addButton("button/ResumeNormal.png", "button/ResumePressed.png", 2,
+		Vec2(visibleSize.width / 2, visibleSize.height / 2));
+	dialog->addButton("button/ExitNormal.png", "button/ExitPressed,png", 3,
+		Vec2(visibleSize.width / 2, visibleSize.height / 2 - 80));
+	dialog->setCallbackFunc(this, callfuncN_selector(
+		GameScene::dialogButtonCallback));
+	addChild(dialog, 3);
+}
+
+void GameScene::dialogButtonCallback(Node* pNode)
+{
+	CCASSERT(pNode != nullptr, "Node is a null pointer");
+	_eventDispatcher->resumeEventListenersForTarget(this, true);
+	if (pNode->getTag() == 2) {}
+	if (pNode->getTag() == 3)
+	{
+		gameOver(0);
+	}
+}
+
 void GameScene::menuSettingCallback(Ref* pSender)
 {
 	auto audio = CocosDenshion::SimpleAudioEngine::getInstance();

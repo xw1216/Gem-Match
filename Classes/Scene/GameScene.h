@@ -2,6 +2,7 @@
 #define __GAME_SCENE__
 
 #include "cocos2d.h"
+#include "Layer/Dialog.h"
 #include "LevelSelect.h"
 #include "GameOver.h"
 #include "GameDefine.h"
@@ -68,6 +69,7 @@ public:
 	// impletation of the row or col clear sprite
 	void explodeHorizontal(SpriteShape* sprite);
 	void explodeVertical(SpriteShape* sprite);
+	void explodeGlobal(SpriteShape* sprite);
 
 	// set, get and find  functions
 	SpriteShape* findSprite(int row, int col);
@@ -82,6 +84,8 @@ public:
 
 	void menuSettingCallback(Ref* pSender);
 	void menuHomeCallback(Ref* pSender);
+	void gamePauseCallback(Ref* pSender);
+	void dialogButtonCallback(Node* pNode);
 	void actionEndCallback(Node* node);
 	bool touchBeganCallback(Touch* touch, Event* event);
 	void touchEndCallback(Touch* touch, Event* event);

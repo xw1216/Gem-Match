@@ -1,7 +1,4 @@
-//胜利的欢呼声 许可:CC-BY 作者:chripei 来源:耳聆网 https://www.ear0.com/sound/19472
 #include "GameOver.h"
-#include<string>
-using namespace std;
 
 cocos2d::Scene* GameOver::createScene()
 {
