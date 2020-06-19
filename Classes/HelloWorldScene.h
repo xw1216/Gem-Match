@@ -2,10 +2,10 @@
 #define __HELLOWORLD_SCENE_H__
 
 #include "cocos2d.h"
-#include "LevelSelect.h"
+#include "Scene/LevelSelect.h"
 #include "GameDefine.h"
 #include "SimpleAudioEngine.h"
-#include "SettingScene.h"
+#include "Scene/SettingScene.h"
 
 class HelloWorld : public cocos2d::Scene
 {
