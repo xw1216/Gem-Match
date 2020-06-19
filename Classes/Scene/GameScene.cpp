@@ -26,17 +26,17 @@ bool GameScene::init()
 		// temporary game settings
 		// should be set in SettingScene in the future
 		m_cols = 6; m_rows = 8;
-		m_steps = 5,m_difficulty = 5;
-
+		m_steps = 1, m_difficulty = 5; m_time = 10;
+		
 		// add background
-		auto background = Sprite::create("Background.png");
+		auto background = Sprite::create("Back_Scene.png");
 		if (background == nullptr)
 		{
 			problemLoading("Background.png");
 		}
 		else
 		{
-			background->setPosition(Vec2::ZERO);
+			background->setPosition(Vec2(kDesignResolutionWidth/2, kDesignResolutionHeight/2));
 			this->addChild(background, -20);
 		}
 	
@@ -53,7 +53,36 @@ bool GameScene::init()
 		initMap();
 		initLimit();
 		initScorer();
-
+		//add home button
+		auto homeItem = MenuItemImage::create(
+			"icon/home.png", "icon/home.png",
+			CC_CALLBACK_1(GameScene::menuHomeCallback, this));
+		if (homeItem == nullptr)
+			problemLoading("'icon/home.png', 'icon/home.png'");
+		else
+		{
+			float const x = kDesignResolutionWidth - homeItem->getContentSize().width;
+			float const y =  homeItem->getContentSize().height;
+			homeItem->setPosition(Vec2(x, y));
+			auto homeMenu = Menu::create(homeItem, NULL);
+			homeMenu->setPosition(Vec2::ZERO);
+			this->addChild(homeMenu, 1);
+		}
+		//add setting buttton
+		auto settingItem = MenuItemImage::create(
+			"icon/setting.png", "icon/setting.png",
+			CC_CALLBACK_1(GameScene::menuSettingCallback, this));
+		if (settingItem == nullptr)
+			problemLoading("'icon/setting.png', 'icon/setting.png'");
+		else
+		{
+			float const x = settingItem->getContentSize().width;
+			float const y = settingItem->getContentSize().height;
+			settingItem->setPosition(Vec2(x, y));
+			auto homeMenu = Menu::create(settingItem, NULL);
+			homeMenu->setPosition(Vec2::ZERO);
+			this->addChild(homeMenu, 1);
+		}
 		// schedule update func to check matchs and refresh
 		scheduleUpdate();
 
@@ -153,6 +182,7 @@ Point GameScene::positionOfItem(int row, int col)
 // refresh the situation about action and filling
 void GameScene::update(float dt)
 {
+
 	// if certain action was going on , check wether it's going on now
 	if (m_isAction)
 	{
@@ -186,6 +216,7 @@ void GameScene::update(float dt)
 			checkAndRemove();
 		}
 	}
+
 	
 }
 
@@ -295,6 +326,11 @@ void GameScene::explodeSprite(SpriteShape* sprite)
 	auto explodeSequence = Sequence::create(explodeSpawn, 
 		CallFuncN::create(CC_CALLBACK_1(GameScene::actionEndCallback, this)), NULL);
 	sprite->runAction(explodeSequence);
+	auto audio = CocosDenshion::SimpleAudioEngine::getInstance();
+	audio->playEffect("music/Dehiscence.mp3", false);
+	audio->playEffect("music/effectnormal.mp3", false);
+
+
 }
 
 
@@ -566,6 +602,7 @@ void GameScene::timer(float dt)
 		gameover->runAction(MoveTo::create(0.5, 
 			Point(kDesignResolutionWidth / 2, kDesignResolutionHeight / 2)));
 		this->addChild(gameover, 1);
+
 		gameOver(0);
 	}
 	return;
@@ -574,6 +611,16 @@ void GameScene::timer(float dt)
 void GameScene::scorer(int num)
 {
 	m_score += num * 50;
+	if (num >= 6&&num<8)
+	{
+		auto audio = CocosDenshion::SimpleAudioEngine::getInstance();
+		audio->playEffect("music/excellent.mp3", false);
+	}
+	else if(num>=8)
+	{
+		auto audio = CocosDenshion::SimpleAudioEngine::getInstance();
+		audio->playEffect("music/excellent.mp3", false);
+	}
 	cocos2d::Label* score = dynamic_cast<cocos2d::Label*>(
 		this->getChildByName("scoreLable"));
 	score->setString(StringUtils::format("Score: %d", m_score));
@@ -583,6 +630,7 @@ void GameScene::scorer(int num)
 // limitation by remaining steps
 void GameScene::pedometer()
 {
+
 	m_steps--;
 	cocos2d::Label* limit = dynamic_cast <cocos2d::Label*>(
 		this->getChildByName("limitSteps"));
@@ -591,14 +639,33 @@ void GameScene::pedometer()
 	else 
 	{
 		limit->setScale(0);
-		auto gameover = Sprite::create("GameOverA.png");
+		/*auto gameover = Sprite::create("GameOverA.png");
 		gameover->setPosition(
 			kDesignResolutionWidth / 2, kDesignResolutionHeight * 1.2);
 		gameover->runAction(MoveTo::create(0.75,
 			Point(kDesignResolutionWidth / 2, kDesignResolutionHeight / 2)));
-		this->addChild(gameover,1);
+		this->addChild(gameover,1);*/
+
+		// if no action, check are there sprites needs to fill
+
+
+		/*int i = 100;
+		do
+		{
+			i--;
+			checkAndRemove();
+
+			fillSprite();
+			CCLOG("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+		} while (i>0);*/
+
+
+
+
 		gameOver(0);
+
 	}
+
 
 }
 
@@ -607,6 +674,7 @@ void GameScene::gameOver(float dt)
 {
 	auto scene = GameOver::create();
 	scene->setScore(m_score);
+	scene->getScore(m_score);
 		Director::getInstance()->replaceScene(
 			TransitionMoveInR::create(kTransitionTime,scene));
 	
@@ -616,6 +684,7 @@ void GameScene::explodeHorizontal(SpriteShape* sprite)
 {
 	
 	// play the particle effects for horizontal clear
+
 	auto explodeParticle = CCParticleSystemQuad::create(
 		"plist/ExplodeHorizon.plist");
 	explodeParticle->setPosition(0,sprite->getPosition().y);
@@ -631,6 +700,9 @@ void GameScene::explodeHorizontal(SpriteShape* sprite)
 		otherSprite = findSprite(row, col);
 		explodeSprite(otherSprite);
 	}
+	auto audio = CocosDenshion::SimpleAudioEngine::getInstance();
+
+	audio->playEffect("music/HandV.mp3", false);
 
 }
 
@@ -651,6 +723,9 @@ void GameScene::explodeVertical(SpriteShape* sprite)
 		otherSprite = findSprite(row, col);
 		explodeSprite(otherSprite);
 	}
+	auto audio = CocosDenshion::SimpleAudioEngine::getInstance();
+
+	audio->playEffect("music/HandV.mp3", false);
 }
 
 SpriteShape* GameScene::findSprite(int row, int col)
@@ -712,6 +787,7 @@ void GameScene::actionEndCallback(Node* node)
 
 bool GameScene::touchBeganCallback(Touch* touch, Event* event)
 {
+	CCLOG("AAAAAAAAAAAAAAAAAAAAA");
 	m_startSprite = nullptr;
 	m_endSprite = nullptr;
 	if (m_enableOperation)
@@ -763,10 +839,24 @@ void GameScene::touchEndCallback(Touch* touch, Event* event)
 		col++;
 	m_endSprite = findSprite(row, col);
 	
-	if (swapMatch())
+	if (swapMatch()&&m_gamemode==0)
 	{
 		pedometer();
 	}
 
 	return;
+}
+void GameScene::menuHomeCallback(Ref* pSender)
+{
+	auto audio = CocosDenshion::SimpleAudioEngine::getInstance();
+	audio->playEffect("music/normalclick.mp3", false);
+	auto scene = HelloWorld::createScene();
+	Director::getInstance()->replaceScene(scene);
+}
+void GameScene::menuSettingCallback(Ref* pSender)
+{
+	auto audio = CocosDenshion::SimpleAudioEngine::getInstance();
+	audio->playEffect("music/normalclick.mp3", false);
+	auto scene = SettingScene::createScene();
+	Director::getInstance()->pushScene(scene);
 }
