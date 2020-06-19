@@ -100,9 +100,10 @@ bool SettingScene::init()
 		}
 		//add slider to contrl background music
 		auto slider = Slider::create();
-		slider->loadBarTexture("Slider_Back.png"); // what the slider looks like
-		slider->loadSlidBallTextures("SliderNode_Normal.png", "SliderNode_Press.png", "SliderNode_Disable.png");
-		slider->loadProgressBarTexture("Slider_PressBar.png");
+		slider->loadBarTexture("button/Slider_Back.png"); // what the slider looks like
+		slider->loadSlidBallTextures("button/SliderNode_Normal.png",
+			"button/SliderNode_Press.png", "button/SliderNode_Disable.png");
+		slider->loadProgressBarTexture("button/Slider_PressBar.png");
 
 		/*int percent;
 		auto audio = CocosDenshion::SimpleAudioEngine::getInstance();*/

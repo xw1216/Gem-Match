@@ -27,7 +27,6 @@ SpriteShape::SpriteShape() noexcept
 
 void SpriteShape::setStatus(SpriteStatus status) 
 {
-	Texture2D* texture = nullptr;
 	m_status = status;
 	switch (status)
 	{
@@ -41,6 +40,11 @@ void SpriteShape::setStatus(SpriteStatus status)
 		m_particle = CCParticleSystemQuad::create("plist/VerticalSprite.plist");
 		m_particle->setPositionType(kCCPositionTypeGrouped);
 		this->addChild(m_particle,-1);
+		break;
+	case Global:
+		m_particle = CCParticleSystemQuad::create("plist/GlobalSprite.plist");
+		m_particle->setPositionType(kCCPositionTypeGrouped);
+		this->addChild(m_particle, -1);
 		break;
 	default:
 		break;
