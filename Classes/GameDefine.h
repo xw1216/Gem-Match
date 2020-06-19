@@ -26,7 +26,7 @@ constexpr char* spriteNormal[kSpriteNum] =
 	"BlockJ.png","BlockK.png","BlockL.png"
 };
 
-enum SpriteStatus { Normal = 0, Horizontal, Vertical };
+enum SpriteStatus { Normal = 0, Horizontal, Vertical, Global };
 
 //for ranklist
 #define max_range 5

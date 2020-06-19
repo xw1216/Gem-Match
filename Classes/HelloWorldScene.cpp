@@ -97,10 +97,10 @@ bool HelloWorld::init()
     }
 
 	//add background
-	auto HelloBack = Sprite::create("Hello_background.jpg");
+	auto HelloBack = Sprite::create("background.png");
 	if (HelloBack == nullptr)
 	{
-		problemLoading("Hello_Back.png");
+		problemLoading("background.png");
 	}
 	else
 	{

@@ -95,7 +95,7 @@ void LevelSelect::gameStartCallback(Ref* pSender)
 	/*scene->setgamemode(0);
 	if (scene->getgamemode() == 0)
 	{
-		CCLOG("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb");
+		CCLOG("bbbbbbbbbbb");
 	}*/
 	Director::getInstance()->replaceScene(TransitionCrossFade::create(kTransitionTime, scene));
 }
