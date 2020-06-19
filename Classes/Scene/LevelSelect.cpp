@@ -101,6 +101,8 @@ void LevelSelect::gameStartCallback(Ref* pSender)
 }
 void LevelSelect::gamerankCallback(Ref* pSender)
 {
+	auto audio = CocosDenshion::SimpleAudioEngine::getInstance();
+	audio->playEffect("music/normalclick.mp3", false);
 	auto scene = RankScene::createScene();
-	Director::getInstance()->replaceScene(TransitionCrossFade::create(kTransitionTime, scene));
+	Director::getInstance()->pushScene(TransitionCrossFade::create(kTransitionTime, scene));
 }

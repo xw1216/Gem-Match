@@ -1,5 +1,9 @@
 #include "SettingScene.h"
 
+using namespace ui;
+
+
+USING_NS_CC;
 
 cocos2d::Scene* SettingScene::createScene()
 {
@@ -59,7 +63,7 @@ bool SettingScene::init()
 			}
 
 			MenuItemToggle* musicItemToggle = MenuItemToggle::createWithCallback(CC_CALLBACK_1(SettingScene::audioMuteCallback, this), musicOn, musicOff, NULL);
-			//musicItemToggle->setPosition(Vec2(320, 457));
+
 
 			float const x = origin.x + visibleSize.width / 2;
 			float const y = origin.y + visibleSize.height / 2;
@@ -84,7 +88,7 @@ bool SettingScene::init()
 			}
 
 			MenuItemToggle* musicItemToggle = MenuItemToggle::createWithCallback(CC_CALLBACK_1(SettingScene::audioMuteCallback, this), musicOff, musicOn, NULL);
-			//musicItemToggle->setPosition(Vec2(320, 457));
+
 
 			float const x = origin.x + visibleSize.width / 2;
 			float const y = origin.y + visibleSize.height / 2;
@@ -94,6 +98,52 @@ bool SettingScene::init()
 			menu->setPosition(Vec2(0, 0));
 			this->addChild(menu);
 		}
+		//add slider to contrl background music
+		auto slider = Slider::create();
+		slider->loadBarTexture("Slider_Back.png"); // what the slider looks like
+		slider->loadSlidBallTextures("SliderNode_Normal.png", "SliderNode_Press.png", "SliderNode_Disable.png");
+		slider->loadProgressBarTexture("Slider_PressBar.png");
+
+		/*int percent;
+		auto audio = CocosDenshion::SimpleAudioEngine::getInstance();*/
+
+		slider->addEventListener(CC_CALLBACK_1(SettingScene::SliderCallBack, this));
+			/*percent = slider->getPercent();
+			audio->setBackgroundMusicVolume(float(percent) / 100);
+			UD_setFloat("musicPercent", percent);*/
+
+		float const x = origin.x + visibleSize.width / 2;
+		float const y = origin.y + visibleSize.height / 2;
+		slider->setPosition(Vec2(x, y - 50));
+		slider->setPercent(UD_getFloat("musicPercent"));
+		this->addChild(slider);
+		/*auto music_slider = Slider::create();
+		music_slider->loadBarTexture("sliderTrack.png");
+		music_slider->loadSlidBallTextures("sliderThumb.png", "sliderThumb.png", "");
+		music_slider->loadProgressBarTexture("sliderProgress.png");
+		//获取之前设置的音乐音量
+		float musicPercent = UD_getFloat("musicPercent");
+
+		//    //第一次默认100
+		//    if(musicPercent == 0.0f){
+		//        musicPercent = 100.0f;
+		//    }
+
+			//设置背景初始值
+		music_slider->setPercent(musicPercent);
+		music_slider->cocos2d::Node::setPosition(Vec2(visibleSize.width * 0.6, visibleSize.height * 0.7));
+		//添加监听器
+		music_slider->addEventListener([=](Ref* pSender, Slider::EventType type) {
+			//当滑块的百分比发生变化的时候
+			if (type == Slider::EventType::ON_PERCENTAGE_CHANGED) {
+				//获得滑动条的百分比
+				int percent = music_slider->getPercent();
+				auto audio = CocosDenshion::SimpleAudioEngine::getInstance();
+				audio->setBackgroundMusicVolume(float(percent) / 100);
+				UD_setFloat("musicPercent", percent);
+			}
+			});
+		this->addChild(music_slider);*/
 		//add back button
 		auto backItem = MenuItemImage::create(
 			"icon/Back.png", "icon/Back.png",
@@ -148,4 +198,20 @@ void SettingScene::menuBackCallback(Ref* pSender)
 	auto audio = CocosDenshion::SimpleAudioEngine::getInstance();
 	audio->playEffect("music/normalclick.mp3", false);
 	Director::getInstance()->popScene();
+}
+void SettingScene::SliderCallBack(Ref* pSender)
+{
+	auto item = (Slider*)(pSender);
+	log("%i", item->getPercent());
+	if (item->getPercent() == 100) {
+		item->setEnabled(false);
+		CCLOG("asdahjwdhasdjasbnda");
+	}
+	else {
+		CCLOG("asdasdasdadfghfhtgf545614146");
+		auto audio = CocosDenshion::SimpleAudioEngine::getInstance();
+		audio->setBackgroundMusicVolume(item->getPercent() / 100.0);
+		UD_setFloat("musicPercent", item->getPercent()); 
+	}
+
 }

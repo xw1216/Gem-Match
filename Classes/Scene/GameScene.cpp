@@ -2,7 +2,7 @@
 
 // a simple GameScene constructor
 GameScene::GameScene() noexcept
-	: m_gamemode(Steps)
+	: m_gamemode(Times)
 {
 	m_isAction = false;m_isFillSprite = false;
 	m_enableOperation = true;
@@ -26,7 +26,7 @@ bool GameScene::init()
 		// temporary game settings
 		// should be set in SettingScene in the future
 		m_cols = 6; m_rows = 8;
-		m_steps = 1, m_difficulty = 5; m_time = 10;
+		m_steps = 1, m_difficulty = 5; m_time = 20;
 		
 		// add background
 		auto background = Sprite::create("Back_Scene.png");
@@ -675,6 +675,7 @@ void GameScene::gameOver(float dt)
 	auto scene = GameOver::create();
 	scene->setScore(m_score);
 	scene->getScore(m_score);
+	scene->setcurrentmode(m_gamemode);
 		Director::getInstance()->replaceScene(
 			TransitionMoveInR::create(kTransitionTime,scene));
 	

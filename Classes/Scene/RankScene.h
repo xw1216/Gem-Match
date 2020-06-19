@@ -16,8 +16,9 @@ public:
 
 	// selector callback
 
-	void menuCloseCallback(cocos2d::Ref* pSender);
-	void menuSettingCallback(cocos2d::Ref* pSender);
+	/*void menuCloseCallback(cocos2d::Ref* pSender);
+	void menuSettingCallback(cocos2d::Ref* pSender);*/
+	void menuBackCallback(cocos2d::Ref* pSender);
 
 	void problemLoading(const char* filename) noexcept
 	{
@@ -26,5 +27,4 @@ public:
 
 };
 #endif //_RANK_SCENE_
-
 

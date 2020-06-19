@@ -82,10 +82,12 @@ bool GameOver::init()
 				// Assign values to the corresponding XML conten
 				UD_setString(StringUtils::format("p%d_name", i).c_str(), "name");
 				UD_setInt(StringUtils::format("p%d_score", i).c_str(), 0);
+				UD_setString(StringUtils::format("p%d_mode", i).c_str(), "mode");
 
 				// Assign values to the corresponding contents of the array
 				p[i - 1].name = "name";
 				p[i - 1].score = 0;
+				p[i - 1].mode = "mode";
 			}
 
 		}
@@ -94,6 +96,7 @@ bool GameOver::init()
 				// Get XML content
 				p[i - 1].name = UD_getString(StringUtils::format("p%d_name", i).c_str());
 				p[i - 1].score = UD_getInt(StringUtils::format("p%d_score", i).c_str());
+				p[i - 1].mode = UD_getString(StringUtils::format("p%d_mode", i).c_str());
 			}
 		}
 	}
@@ -140,7 +143,6 @@ void GameOver::gameStartCallback(Ref* pSender)
 }
 bool GameOver::touchBeganCallback(Touch* touch, Event* event)
 {
-	CCLOG("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
 	//Used to determine whether the control is in the point  
 	bool isClicked = textEdit->boundingBox().containsPoint(touch->getLocation());
 	
@@ -159,6 +161,7 @@ void GameOver::menuSubmitCallback(Ref* pSender)
 {
 	p[max_range].name = textEdit->getString();
 	p[max_range].score = finalScore;
+	p[max_range].mode = current_mode;
 
 	bool isExist = false;
 	// is player in ranklist
@@ -189,14 +192,30 @@ void GameOver::menuSubmitCallback(Ref* pSender)
 		// Assign values to the corresponding XML content
 		UD_setString(StringUtils::format("p%d_name", i).c_str(), p[i - 1].name);
 		UD_setInt(StringUtils::format("p%d_score", i).c_str(), p[i - 1].score);
+		UD_setString(StringUtils::format("p%d_mode", i).c_str(), p[i - 1].mode);
 		CCUserDefault::sharedUserDefault()->flush();
 	}
 
 	// 这里，是用来测试的，忽略不计吧
 	CCLOG(p[0].name.c_str());
 	CCLOG("score:%d", p[0].score);
+	CCLOG("mode:%s", p[0].mode.c_str());
 	CCLOG(p[1].name.c_str());
 	CCLOG("score:%d", p[1].score);
+	CCLOG("mode:%s", p[1].mode.c_str());
 	CCLOG(p[2].name.c_str());
 	CCLOG("score:%d\n", p[2].score);
+	CCLOG("mode:%s", p[3].mode.c_str());
+}
+void GameOver::setcurrentmode(int modetype)
+{
+	switch(modetype)
+	{
+		case 0:
+		current_mode = "Steps";
+		break;
+		case 1:
+		current_mode = "Times";
+		break;
+	}	
 }
