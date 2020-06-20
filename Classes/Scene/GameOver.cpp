@@ -13,7 +13,7 @@ bool GameOver::init()
 	}
 	else
 	{
-		Size visibleSize = Director::getInstance()->getVisibleSize();
+		Size const visibleSize = Director::getInstance()->getVisibleSize();
 		// add background
 		auto background = Sprite::create("Background.png");
 		if (background == nullptr)
@@ -99,7 +99,7 @@ bool GameOver::init()
 	}
 }
 
-void GameOver::setScore(int score) noexcept
+void GameOver::setScore(int score)
 {
 	int highestScore = CCUserDefault::sharedUserDefault()->
 		getIntegerForKey("highestScore");

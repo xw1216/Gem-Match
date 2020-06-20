@@ -5,6 +5,7 @@
 #include "GameDefine.h"
 #include "GameScene.h"
 #include "HelloWorldScene.h"
+#include "Layer/Dialog.h"
 
 USING_NS_CC;
 
@@ -17,10 +18,17 @@ public:
 
 	virtual bool init();
 
+	Menu* addButtonItem(const char* image, const Vec2 position,
+		const ccMenuCallback& callback);
+	void popDialog(GameMode mode, SEL_CallFuncN callfunc);
+
 	// Selector Callback
 	void menuBackCallback(Ref* pSender);
-	void gameStartCallback(Ref* pSender);
-	void gamerankCallback(Ref* pSender);
+	void gameRankCallback(Ref* pSender);
+	void timeModeCallback(Ref* pSender);
+	void stepModeCallback(Ref* pSender);
+	void creativeModeCallback(Ref* pSender);
+	void dialogButtonCallback(Node* pNode);
 
 	void  problemLoading(const char* filename) noexcept
 	{

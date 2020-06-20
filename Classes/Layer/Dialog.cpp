@@ -48,38 +48,38 @@ void Dialog::onEnter()
 	}
 	if (getTitle())
 	{
-		Label* title = Label::create(getTitle(), "", getTitleSize());
+		Label* title = Label::create(getTitle(), "fonts/FZCHSJW.ttf", getTitleSize());
 		title->setColor(Color3B::BLACK);
 		title->setPosition(visableSize.width / 2, visableSize.height / 2 + 140);
 		addChild(title, 1);
 	}
 	if (getContentLabel())
 	{
-		Label* content = Label::create(getContentLabel(), "", getContentFontSize());
+		Label* content = Label::create(getContentLabel(), "fonts/FZCHSJW.ttf", getContentFontSize());
 		content->setColor(Color3B::BLACK);
-		content->setPosition(visableSize.width / 2, visableSize.height / 2 + 70);
+		content->setPosition(visableSize.width / 2, visableSize.height / 2 + 80);
 		addChild(content, 1);
 	}
 
 	auto action = Spawn::createWithTwoActions(
-		ScaleTo::create(1.1,1.1), FadeIn::create(1));
+		ScaleTo::create(0.5,1.1), FadeIn::create(0.5));
 	this->runAction(action);
 
 }
 
-bool Dialog::addButton(const char* normalImage, const char* selectedImage, const char* button_title, int tag, Vec2 position)
+bool Dialog::addButton(const char* normalImage, const char* selectedImage, std::string button_title, int tag, Vec2 position)
 {
 	MenuItemImage* menuImage = MenuItemImage::create(
 		normalImage, selectedImage, this, menu_selector(Dialog::buttonCallback));
 	menuImage->setTag(tag);
-	menuImage->setPosition(position);
 
 	CCSize const menuSize = menuImage->getContentSize();
-	LabelTTF* ttf = LabelTTF::create(button_title, "", 35);
+	LabelTTF* ttf = LabelTTF::create(button_title, "", 20);
 	ttf->setColor(Color3B::BLACK);
 	ttf->setPosition(ccp(menuSize.width / 2, menuSize.height / 2));
 	menuImage->addChild(ttf);
 	Menu* menu = Menu::create(menuImage, NULL);
+	menu->setPosition(position);
 	node.pushBack(menu);
 	return true;
 }
