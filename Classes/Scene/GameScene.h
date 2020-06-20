@@ -18,7 +18,6 @@ public:
 	
 	// three game mode are designed 
 	// and could be selected in levelselect
-	enum GameMode{Steps=0,Times,Creative};
 
 	GameScene() noexcept;
 	// create related function
@@ -72,16 +71,15 @@ public:
 	void explodeGlobal(SpriteShape* sprite);
 
 	// set, get and find  functions
+	void setGameMode();
 	SpriteShape* findSprite(int row, int col);
 	SpriteShape* findSprite(const Point& point);
 	int getDifficulty() noexcept { return m_difficulty; } const
 	void setDifficulty(int num) noexcept { m_difficulty = num; }
 	void setBlockOriginPosition();
 	void  problemLoading(const char* filename) noexcept;
-	/*void setgamemode(int typemode) { m_gamemode = (GameMode)typemode; };
-	GameMode getgamemode() { return  m_gamemode; };*/
+	
 	// callbacks
-
 	void menuSettingCallback(Ref* pSender);
 	void menuHomeCallback(Ref* pSender);
 	void gamePauseCallback(Ref* pSender);
@@ -90,7 +88,9 @@ public:
 	bool touchBeganCallback(Touch* touch, Event* event);
 	void touchEndCallback(Touch* touch, Event* event);
 	
-	// protected varieble rows and cols
+	// protected varieble
+	CC_SYNTHESIZE(int, m_time, times);
+	CC_SYNTHESIZE(int, m_steps, steps);
 	CC_SYNTHESIZE(int, m_rows, Rows);
 	CC_SYNTHESIZE(int, m_cols, Cols);
 
@@ -105,8 +105,6 @@ private:
 	// user can customize them in the future
 	GameMode m_gamemode;
 	int m_difficulty;
-	int m_steps;
-	int m_time;
 	int m_score;
 
 	// data to identify the swap and special sprites

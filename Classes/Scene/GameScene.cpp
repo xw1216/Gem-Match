@@ -2,7 +2,6 @@
 
 // a simple GameScene constructor
 GameScene::GameScene() noexcept
-	: m_gamemode(Steps)
 {
 	m_isAction = false;m_isFillSprite = false;
 	m_enableOperation = true;
@@ -23,10 +22,11 @@ bool GameScene::init()
 	}
 	else
 	{
+		setGameMode();
 		// temporary game settings
 		// should be set in SettingScene in the future
 		m_cols = 6; m_rows = 8;
-		m_steps = 15, m_difficulty = 4; m_time = 20;
+		m_steps = 2, m_difficulty = 4; m_time = 20;
 		
 		// add background
 		auto background = Sprite::create("Back_Scene.png");
@@ -144,11 +144,13 @@ void GameScene::initLimit()
 	switch (m_gamemode)
 	{
 	case Steps:
+		m_steps = UD_getInt("Steps");
 		limitLable = Label::createWithTTF(
 			config, StringUtils::format("Steps : %d", m_steps));
 		limitLable->setName("limitSteps");
 		break;
 	case Times:
+		m_time = UD_getInt("Times");
 		limitLable = Label::createWithTTF(
 			config, StringUtils::format("Time : %d", m_time));
 		limitLable->setName("limitTimes");
@@ -229,6 +231,10 @@ void GameScene::update(float dt)
 		{
 			checkAndRemove();
 		}
+		if (m_gamemode == Steps && m_isFillSprite
+			&& m_enableOperation && m_steps <= -1
+			&& this->getNumberOfRunningActions() <=0)
+			gameOver(0);
 	}
 
 	
@@ -658,31 +664,6 @@ void GameScene::pedometer()
 	else 
 	{
 		limit->setScale(0);
-		/*auto gameover = Sprite::create("GameOverA.png");
-		gameover->setPosition(
-			kDesignResolutionWidth / 2, kDesignResolutionHeight * 1.2);
-		gameover->runAction(MoveTo::create(0.75,
-			Point(kDesignResolutionWidth / 2, kDesignResolutionHeight / 2)));
-		this->addChild(gameover,1);*/
-
-		// if no action, check are there sprites needs to fill
-
-
-		/*int i = 100;
-		do
-		{
-			i--;
-			checkAndRemove();
-
-			fillSprite();
-			CCLOG("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
-		} while (i>0);*/
-
-
-
-
-		gameOver(0);
-
 	}
 
 
@@ -769,6 +750,17 @@ void GameScene::explodeGlobal(SpriteShape* sprite)
 				if (index == otherSprite->getImageIndex())
 					explodeSprite(otherSprite);
 		}
+}
+
+void GameScene::setGameMode()
+{
+	int mode = UD_getInt("Gamemode");
+	if (mode == 0)
+		m_gamemode = Steps;
+	else if (mode == 1)
+		m_gamemode = Times;
+	else
+	m_gamemode = Creative;
 }
 
 SpriteShape* GameScene::findSprite(int row, int col)

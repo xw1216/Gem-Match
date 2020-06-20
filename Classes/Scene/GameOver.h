@@ -24,7 +24,7 @@ public:
 
 	virtual bool init();
 
-	void setScore(int score) noexcept;
+	void setScore(int score);
 	void getScore(int score) { finalScore = score; };
 	void setcurrentmode(int modetyoe);
 
