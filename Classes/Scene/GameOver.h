@@ -6,6 +6,7 @@
 #include "LevelSelect.h"
 #include "GameScene.h"
 #include "SimpleAudioEngine.h"
+#include "Layer/Dialog.h"
 
 USING_NS_CC;
 
@@ -27,6 +28,8 @@ public:
 	void setScore(int score);
 	void getScore(int score) { finalScore = score; };
 	void setcurrentmode(int modetyoe);
+	void popDialog(SEL_CallFuncN callfunc);
+	void dialogButtonCallback(Node* pNode);
 
 	void levelSelectBackCallback(Ref* pSender);
 	void gameStartCallback(Ref* pSender);

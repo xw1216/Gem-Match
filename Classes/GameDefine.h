@@ -11,8 +11,8 @@ constexpr int kDesignResolutionWidth = 540;
 constexpr int kDesignResolutionHeight = 960;
 
 constexpr int kSpriteNum = 12;
-constexpr int kSpriteWidth = 80, 
-					  kSpriteHeight = 80;
+constexpr int kSpriteWidth = 80,
+kSpriteHeight = 80;
 constexpr int kIconlength = 50;
 
 constexpr int kBorderWidth = 4;
@@ -28,7 +28,7 @@ constexpr char* spriteNormal[kSpriteNum] =
 	"BlockJ.png","BlockK.png","BlockL.png"
 };
 
-enum GameMode { Steps = 0, Times =1, Creative =2 };
+enum GameMode { Steps = 0, Times = 1, Creative = 2 };
 enum SpriteStatus { Normal = 0, Horizontal, Vertical, Global };
 
 //for ranklist

@@ -184,6 +184,7 @@ void SettingScene::audioMuteCallback(Ref* pSender)
 			setIntegerForKey(MUSIC_KEY, false);
 		CCUserDefault::sharedUserDefault()->flush();
 		audio->pauseBackgroundMusic();
+		UD_setBool("music_paused", true);
 	}
 	else
 	{
@@ -191,7 +192,17 @@ void SettingScene::audioMuteCallback(Ref* pSender)
 		CCUserDefault::sharedUserDefault()->
 			setIntegerForKey(MUSIC_KEY, true);
 		CCUserDefault::sharedUserDefault()->flush();
-		audio->resumeBackgroundMusic();
+		if (UD_getBool("music_paused"))
+		{
+			audio->resumeBackgroundMusic();
+		}
+		else
+		{
+			float percent = UD_getInt("musicPercent");
+			audio->playBackgroundMusic("music/Olimpica.mp3", true);
+			audio->setBackgroundMusicVolume(percent / 100.0);
+		}
+		
 	}
 }
 void SettingScene::menuBackCallback(Ref* pSender)
@@ -206,10 +217,10 @@ void SettingScene::SliderCallBack(Ref* pSender)
 	log("%i", item->getPercent());
 	if (item->getPercent() == 100) {
 		item->setEnabled(false);
-		CCLOG("asdahjwdhasdjasbnda");
+
 	}
 	else {
-		CCLOG("asdasdasdadfghfhtgf545614146");
+
 		auto audio = CocosDenshion::SimpleAudioEngine::getInstance();
 		audio->setBackgroundMusicVolume(item->getPercent() / 100.0);
 		UD_setFloat("musicPercent", item->getPercent()); 

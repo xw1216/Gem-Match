@@ -3,9 +3,9 @@
 // a simple GameScene constructor
 GameScene::GameScene() noexcept
 {
-	m_isAction = false;m_isFillSprite = false;
+	m_isAction = false; m_isFillSprite = false;
 	m_enableOperation = true;
-	m_difficulty = 1;m_time = 0;m_steps = 0,m_score = 0;
+	m_difficulty = 1; m_time = 0; m_steps = 0, m_score = 0;
 	m_startSprite = nullptr; m_endSprite = nullptr;
 }
 
@@ -22,12 +22,16 @@ bool GameScene::init()
 	}
 	else
 	{
+		
+
+
+
 		setGameMode();
 		// temporary game settings
 		// should be set in SettingScene in the future
 		m_cols = 6; m_rows = 8;
 		m_steps = 2, m_difficulty = 4; m_time = 20;
-		
+
 		// add background
 		auto background = Sprite::create("Back_Scene.png");
 		if (background == nullptr)
@@ -36,15 +40,26 @@ bool GameScene::init()
 		}
 		else
 		{
-			background->setPosition(Vec2(kDesignResolutionWidth/2, kDesignResolutionHeight/2));
+			background->setPosition(Vec2(kDesignResolutionWidth / 2, kDesignResolutionHeight / 2));
 			this->addChild(background, -20);
 		}
-	
+		auto loadbar = Sprite::create("loadingbar4.png");
+		if (loadbar == nullptr)
+		{
+			problemLoading("loadbar.png");
+		}
+		else
+		{
+			loadbar->setPosition(Vec2(kDesignResolutionWidth / 2 + 150,
+				kDesignResolutionHeight / 2 + 370));
+			this->addChild(loadbar, 1);
+		}
+
 		// add touch listener of the touch action
 		auto touchListener = EventListenerTouchOneByOne::create();
-		touchListener->onTouchBegan = 
+		touchListener->onTouchBegan =
 			CC_CALLBACK_2(GameScene::touchBeganCallback, this);
-		touchListener->onTouchEnded=
+		touchListener->onTouchEnded =
 			CC_CALLBACK_2(GameScene::touchEndCallback, this);
 		_eventDispatcher->addEventListenerWithSceneGraphPriority(
 			touchListener, this);
@@ -62,7 +77,7 @@ bool GameScene::init()
 		else
 		{
 			float const x = kDesignResolutionWidth - homeItem->getContentSize().width;
-			float const y =  homeItem->getContentSize().height;
+			float const y = homeItem->getContentSize().height;
 			homeItem->setPosition(Vec2(x, y));
 			auto homeMenu = Menu::create(homeItem, NULL);
 			homeMenu->setPosition(Vec2::ZERO);
@@ -97,6 +112,18 @@ bool GameScene::init()
 			pauseMenu->setPosition(Vec2::ZERO);
 			this->addChild(pauseMenu, 1);
 		}
+		//add Goal label
+		int m_goal = UD_getInt("Goal");
+		TTFConfig config("fonts/MFShangZhen.ttf", 25);
+		cocos2d::Label* goalLabel = nullptr;
+		goalLabel = Label::createWithTTF(
+			config, StringUtils::format("Goal : %d", m_goal));
+		goalLabel->setName("limitSteps");
+		goalLabel->setColor(Color3B::BLACK);
+		goalLabel->setPosition(goalLabel->getContentSize().width + 70,
+			kDesignResolutionHeight - 50 - goalLabel->getContentSize().height * 2);
+		this->addChild(goalLabel);
+		
 		// schedule update func to check matchs and refresh
 		scheduleUpdate();
 
@@ -110,7 +137,7 @@ void GameScene::initMap()
 	setBlockOriginPosition();
 	srand(time(0));
 	int index = 0;
-	for(int row = 0; row < getRows(); row++)
+	for (int row = 0; row < getRows(); row++)
 		for (int col = 0; col < getCols(); col++)
 		{
 			index = rand() % m_difficulty;
@@ -118,7 +145,7 @@ void GameScene::initMap()
 		}
 }
 
-void GameScene::createSprite(int row,int col,int index)
+void GameScene::createSprite(int row, int col, int index)
 {
 	SpriteShape* sprite = SpriteShape::create(row, col, index);
 	CCASSERT(sprite, "Null Pointer!");
@@ -127,12 +154,12 @@ void GameScene::createSprite(int row,int col,int index)
 	Point const endPosition = positionOfItem(row, col);
 	Point const startPosition = positionOfAnimateItem(endPosition);
 	float const speed = startPosition.y / (1 * kDesignResolutionHeight);
-	
+
 	sprite->setPosition(startPosition);
 	sprite->runAction(MoveTo::create(speed, endPosition));
-	this->addChild(sprite,0);
+	this->addChild(sprite, 0);
 	// store the sprite into map for further searching
-	m_blocks.insert(BlockPair(Point(row, col),sprite));
+	m_blocks.insert(BlockPair(Point(row, col), sprite));
 }
 
 // add limitation for playability according to selected gamemode
@@ -140,7 +167,7 @@ void GameScene::initLimit()
 {
 	TTFConfig config("fonts/MFShangZhen.ttf", 25);
 	cocos2d::Label* limitLable = nullptr;
-	
+
 	switch (m_gamemode)
 	{
 	case Steps:
@@ -164,7 +191,7 @@ void GameScene::initLimit()
 
 	limitLable->setColor(Color3B::BLACK);
 	limitLable->setPosition(limitLable->getContentSize().width,
-		kDesignResolutionHeight - limitLable->getContentSize().height *2);
+		kDesignResolutionHeight - limitLable->getContentSize().height * 2);
 	this->addChild(limitLable);
 }
 
@@ -183,7 +210,7 @@ void GameScene::initScorer()
 
 Point GameScene::positionOfAnimateItem(Point point)
 {
-	return Point(point.x,point.y+kDesignResolutionHeight);
+	return Point(point.x, point.y + kDesignResolutionHeight);
 }
 
 Point GameScene::positionOfItem(int row, int col)
@@ -192,13 +219,13 @@ Point GameScene::positionOfItem(int row, int col)
 		(kSpriteWidth + kBorderWidth) * col + kSpriteHeight / 2;
 	float const y = m_blockOrigin.y +
 		(kSpriteHeight + kBorderWidth) * row + kSpriteHeight / 2;
-	return Point(x,y);
+	return Point(x, y);
 }
 
 // refresh the situation about action and filling
 void GameScene::update(float dt)
 {
-
+	
 	// if certain action was going on , check wether it's going on now
 	if (m_isAction)
 	{
@@ -233,18 +260,18 @@ void GameScene::update(float dt)
 		}
 		if (m_gamemode == Steps && m_isFillSprite
 			&& m_enableOperation && m_steps <= -1
-			&& this->getNumberOfRunningActions() <=0)
+			&& this->getNumberOfRunningActions() <= 0)
 			gameOver(0);
 	}
 
-	
+
 }
 
 // when there is no action or filling
 // begin to check all matches and remove them
 void GameScene::checkAndRemove()
 {
-	SpriteShape  *sprite = nullptr;
+	SpriteShape* sprite = nullptr;
 	// reset all sprite to be not ignored
 	for (int row = 0; row < getRows(); row++)
 		for (int col = 0; col < getCols(); col++)
@@ -303,7 +330,7 @@ void GameScene::checkAndRemove()
 	removeSprite();
 }
 
-void GameScene::markRemove (SpriteShape* sprite) noexcept
+void GameScene::markRemove(SpriteShape* sprite) noexcept
 {
 	if (sprite == nullptr)
 		return;
@@ -348,7 +375,7 @@ void GameScene::explodeSprite(SpriteShape* sprite)
 		return;
 	auto explodeSpawn = Spawn::createWithTwoActions(
 		ScaleTo::create(0.25, 0), FadeOut::create(0.25));
-	auto explodeSequence = Sequence::create(explodeSpawn, 
+	auto explodeSequence = Sequence::create(explodeSpawn,
 		CallFuncN::create(CC_CALLBACK_1(GameScene::actionEndCallback, this)), NULL);
 	sprite->runAction(explodeSequence);
 	auto audio = CocosDenshion::SimpleAudioEngine::getInstance();
@@ -363,12 +390,12 @@ void GameScene::colCheck(SpriteShape* sprite, std::list<SpriteShape*>& colChain)
 {
 	// checkAndRemove() makes sure that sprite is not nullptr
 	colChain.push_back(sprite);
-	
+
 	SpriteShape* neighbourSprite = nullptr;
 
 	// left hand search
-	for (int neighbourCol = sprite->getCol() - 1; 
-			neighbourCol >= 0; neighbourCol--)
+	for (int neighbourCol = sprite->getCol() - 1;
+		neighbourCol >= 0; neighbourCol--)
 	{
 		neighbourSprite = findSprite(sprite->getRow(), neighbourCol);
 		if (neighbourSprite != nullptr &&
@@ -398,7 +425,7 @@ void GameScene::colCheck(SpriteShape* sprite, std::list<SpriteShape*>& colChain)
 			break;
 		}
 	}
-	
+
 }
 
 void GameScene::rowCheck(SpriteShape* sprite, std::list<SpriteShape*>& rowChain)
@@ -408,7 +435,7 @@ void GameScene::rowCheck(SpriteShape* sprite, std::list<SpriteShape*>& rowChain)
 	SpriteShape* neighbourSprite = nullptr;
 
 	// downward search
-	for (int neighbourRow = sprite->getRow() -  1;
+	for (int neighbourRow = sprite->getRow() - 1;
 		neighbourRow >= 0; neighbourRow--)
 	{
 		neighbourSprite = findSprite(neighbourRow, sprite->getCol());
@@ -424,7 +451,7 @@ void GameScene::rowCheck(SpriteShape* sprite, std::list<SpriteShape*>& rowChain)
 		}
 	}
 	// upwards sreach
-	for (int neighbourRow = sprite->getRow() +1;
+	for (int neighbourRow = sprite->getRow() + 1;
 		neighbourRow < getRows(); neighbourRow++)
 	{
 		neighbourSprite = findSprite(neighbourRow, sprite->getCol());
@@ -438,7 +465,7 @@ void GameScene::rowCheck(SpriteShape* sprite, std::list<SpriteShape*>& rowChain)
 		{
 			break;
 		}
-	}	
+	}
 }
 
 void GameScene::fillSprite()
@@ -467,7 +494,7 @@ void GameScene::fillSprite()
 					Point const endPosition = positionOfItem(newRow, col);
 					Point const startPosition = sprite->getPosition();
 
-					float const speed = (startPosition.y - endPosition.y) / kDesignResolutionHeight *3;
+					float const speed = (startPosition.y - endPosition.y) / kDesignResolutionHeight * 3;
 					sprite->stopAllActions();
 					sprite->runAction(MoveTo::create(speed, endPosition));
 					sprite->setRow(newRow);
@@ -478,7 +505,7 @@ void GameScene::fillSprite()
 		// calculate and refresh the game score
 		scorer(removedCounter);
 	}
-	
+
 	// create new sprites randomly to fill in the blanks
 	int index = 0;
 	srand(time(0));
@@ -496,9 +523,9 @@ void GameScene::fillSprite()
 void GameScene::swapSprite()
 {
 	const int  startRow = m_startSprite->getRow(),
-		 startCol = m_startSprite->getCol(),
-		 endRow = m_endSprite->getRow(),
-		 endCol = m_endSprite->getCol();
+		startCol = m_startSprite->getCol(),
+		endRow = m_endSprite->getRow(),
+		endCol = m_endSprite->getCol();
 
 	m_blocks.erase(Point(startRow, startCol));
 	m_blocks.erase(Point(endRow, endCol));
@@ -524,7 +551,7 @@ bool GameScene::swapMatch()
 
 	Point const departure = m_startSprite->getPosition();
 	Point const destination = m_endSprite->getPosition();
-	
+
 	swapSprite();
 	std::list<SpriteShape*>
 		colChainStart, rowChainStart,
@@ -551,10 +578,10 @@ bool GameScene::swapMatch()
 	m_startSprite->runAction(Sequence::create(
 		MoveTo::create(kBlockSwapTime, destination),
 		MoveTo::create(kBlockSwapTime, departure),
-		DelayTime::create(0.75),nullptr));
+		DelayTime::create(0.75), nullptr));
 	m_endSprite->runAction(Sequence::create(
 		MoveTo::create(kBlockSwapTime, departure),
-		MoveTo::create(kBlockSwapTime, destination), 
+		MoveTo::create(kBlockSwapTime, destination),
 		DelayTime::create(0.75), nullptr));
 	return false;
 }
@@ -562,14 +589,14 @@ bool GameScene::swapMatch()
 // mainly designed to identify the special sprites and refresh
 // the ignorance, isneedremove and particle effcts
 void GameScene::processMatch(std::list<SpriteShape*>
-	& matchList,SpriteStatus matchType)
+	& matchList, SpriteStatus matchType)
 {
 	// mark and set status for all of the blocks in a manully match
 	SpriteShape* sprite = nullptr;
 	bool isThereSpriteIgnored = false;
 
-	for (std::list<SpriteShape*>::iterator iterList = matchList.begin(); 
-			iterList != matchList.end(); iterList++)
+	for (std::list<SpriteShape*>::iterator iterList = matchList.begin();
+		iterList != matchList.end(); iterList++)
 	{
 		sprite = *iterList;
 
@@ -587,7 +614,7 @@ void GameScene::processMatch(std::list<SpriteShape*>
 
 				sprite->setStatus(matchType);
 				sprite->getParticle()->setPosition(
-					kSpriteWidth/2,kSpriteHeight/2);
+					kSpriteWidth / 2, kSpriteHeight / 2);
 				continue;
 			}
 		}
@@ -613,6 +640,12 @@ void GameScene::timer(float dt)
 	m_time--;
 	cocos2d::Label* limit = dynamic_cast <cocos2d::Label*>(
 		this->getChildByName("limitTimes"));
+	int currentgoal = UD_getInt("Goal");
+	if (m_score >= currentgoal)
+	{
+		int current_diff = UD_getInt("gamediff");
+		increase_diff(current_diff);
+	}
 	if (m_time > 0)
 	{
 		limit->setString(StringUtils::format("Time : %d", m_time));
@@ -624,7 +657,7 @@ void GameScene::timer(float dt)
 		auto gameover = Sprite::create("GameOverA.png");
 		gameover->setPosition(
 			kDesignResolutionWidth / 2, kDesignResolutionHeight * 1.2);
-		gameover->runAction(MoveTo::create(0.5, 
+		gameover->runAction(MoveTo::create(0.5,
 			Point(kDesignResolutionWidth / 2, kDesignResolutionHeight / 2)));
 		this->addChild(gameover, 1);
 
@@ -636,12 +669,12 @@ void GameScene::timer(float dt)
 void GameScene::scorer(int num)
 {
 	m_score += num * 50;
-	if (num >= 6&&num<8)
+	if (num >= 6 && num < 8)
 	{
 		auto audio = CocosDenshion::SimpleAudioEngine::getInstance();
 		audio->playEffect("music/excellent.mp3", false);
 	}
-	else if(num>=8)
+	else if (num >= 8)
 	{
 		auto audio = CocosDenshion::SimpleAudioEngine::getInstance();
 		audio->playEffect("music/excellent.mp3", false);
@@ -649,7 +682,17 @@ void GameScene::scorer(int num)
 	cocos2d::Label* score = dynamic_cast<cocos2d::Label*>(
 		this->getChildByName("scoreLable"));
 	score->setString(StringUtils::format("Score: %d", m_score));
-
+	//add loadingbar
+	auto loadingBar = LoadingBar::create("load_bar2.png");
+	if (loadingBar == nullptr)
+	{
+		problemLoading("load_bar4.png");
+	}
+	loadingBar->setDirection(LoadingBar::Direction::LEFT);
+	loadingBar->setPercent((100*m_score)/ UD_getInt("Goal"));
+	loadingBar->setPosition(Vec2(kDesignResolutionWidth / 2+150,
+		kDesignResolutionHeight / 2+370));
+	this->addChild(loadingBar, 20);
 }
 
 // limitation by remaining steps
@@ -659,9 +702,15 @@ void GameScene::pedometer()
 	m_steps--;
 	cocos2d::Label* limit = dynamic_cast <cocos2d::Label*>(
 		this->getChildByName("limitSteps"));
+	int currentgoal = UD_getInt("Goal");
+	if (m_score >= currentgoal)
+	{
+		int current_diff = UD_getInt("gamediff");
+		increase_diff(current_diff);
+	}
 	if (m_steps > 0)
 		limit->setString(StringUtils::format("Steps : % d", m_steps));
-	else 
+	else
 	{
 		limit->setScale(0);
 	}
@@ -676,24 +725,24 @@ void GameScene::gameOver(float dt)
 	scene->setScore(m_score);
 	scene->getScore(m_score);
 	scene->setcurrentmode(m_gamemode);
-		Director::getInstance()->replaceScene(
-			TransitionMoveInR::create(kTransitionTime,scene));
-	
+	Director::getInstance()->replaceScene(
+		TransitionMoveInR::create(kTransitionTime, scene));
+
 }
 
 void GameScene::explodeHorizontal(SpriteShape* sprite)
 {
-	
+
 	// play the particle effects for horizontal clear
 
 	auto explodeParticle = CCParticleSystemQuad::create(
 		"plist/ExplodeHorizon.plist");
-	explodeParticle->setPosition(0,sprite->getPosition().y);
+	explodeParticle->setPosition(0, sprite->getPosition().y);
 	explodeParticle->runAction(MoveTo::create(kTransitionTime,
-		Point(2*kDesignResolutionWidth, sprite->getPosition().y)));
+		Point(2 * kDesignResolutionWidth, sprite->getPosition().y)));
 	this->addChild(explodeParticle, 2);
 	explodeParticle->setAutoRemoveOnFinish(true);
-	
+
 	int const row = sprite->getRow();
 	SpriteShape* otherSprite = nullptr;
 	for (int col = 0; col < getCols(); col++)
@@ -711,9 +760,9 @@ void GameScene::explodeVertical(SpriteShape* sprite)
 {
 	auto explodeParticle = CCParticleSystemQuad::create(
 		"plist/ExplodeVertical.plist");
-	explodeParticle->setPosition(sprite->getPosition().x,0);
+	explodeParticle->setPosition(sprite->getPosition().x, 0);
 	explodeParticle->runAction(MoveTo::create(kTransitionTime,
-		Point(sprite->getPosition().x,2* kDesignResolutionHeight)));
+		Point(sprite->getPosition().x, 2 * kDesignResolutionHeight)));
 	this->addChild(explodeParticle, 2);
 	explodeParticle->setAutoRemoveOnFinish(true);
 
@@ -760,7 +809,7 @@ void GameScene::setGameMode()
 	else if (mode == 1)
 		m_gamemode = Times;
 	else
-	m_gamemode = Creative;
+		m_gamemode = Creative;
 }
 
 SpriteShape* GameScene::findSprite(int row, int col)
@@ -813,7 +862,7 @@ void  GameScene::problemLoading(const char* filename) noexcept
 
 void GameScene::actionEndCallback(Node* node)
 {
-	SpriteShape* sprite = 
+	SpriteShape* sprite =
 		dynamic_cast<SpriteShape*>(node);
 	m_blocks.erase(Point(sprite->getRow(), sprite->getCol()));
 	// sprite are finally destroyed here
@@ -873,8 +922,8 @@ void GameScene::touchEndCallback(Touch* touch, Event* event)
 	else if (rightRec.containsPoint(location))
 		col++;
 	m_endSprite = findSprite(row, col);
-	
-	if (swapMatch()&&m_gamemode==0)
+
+	if (swapMatch() && m_gamemode == 0)
 	{
 		pedometer();
 	}
@@ -923,4 +972,13 @@ void GameScene::menuSettingCallback(Ref* pSender)
 	audio->playEffect("music/normalclick.mp3", false);
 	auto scene = SettingScene::createScene();
 	Director::getInstance()->pushScene(scene);
+}
+void GameScene::increase_diff(int diff)
+{
+	int m_goal = UD_getInt("Goal");
+	UD_setInt("gamediff", diff+1);
+	UD_setInt("Goal", m_goal + 2000);
+	auto scene = GameScene::create();
+	Director::getInstance()->replaceScene(
+		TransitionCrossFade::create(kTransitionTime, scene));
 }
