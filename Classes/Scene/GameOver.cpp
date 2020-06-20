@@ -63,13 +63,27 @@ bool GameOver::init()
 		this->addChild(textEdit);
 
 		//add Summit button
-		auto submitItem = MenuItemFont::create("Submit", CC_CALLBACK_1(GameOver::menuSubmitCallback, this));
-		submitItem->setColor(Color3B::BLACK);
-		submitItem->setPosition(Vec2(visibleSize.width / 2, visibleSize.height - textEdit->getContentSize().height * 9));
+		auto startItem = MenuItemImage::create(
+			"button/button_normal.png",
+			"button/button_clicked.png",
+			CC_CALLBACK_1(GameOver::menuSubmitCallback, this));
 
-		auto menu = Menu::create(submitItem, NULL);
-		menu->setPosition(Vec2::ZERO);
-		this->addChild(menu, 1);
+		if (startItem == nullptr ||
+			startItem->getContentSize().width <= 0 ||
+			startItem->getContentSize().height <= 0)
+		{
+			problemLoading("button/StartNormal.png and button/StartSelected.png");
+		}
+		else
+		{
+			float const x = visibleSize.width / 2;
+			float const y = visibleSize.height / 5;
+			startItem->setPosition(Vec2(x, y));
+		}
+
+		auto menuStart = Menu::create(startItem, NULL);
+		menuStart->setPosition(Vec2::ZERO);
+		this->addChild(menuStart, 2);
 
 
 		if (!UD_getBool("isExist", false)) {
@@ -103,10 +117,10 @@ void GameOver::setScore(int score)
 {
 	int highestScore = CCUserDefault::sharedUserDefault()->
 		getIntegerForKey("highestScore");
-	if(score>highestScore)
+	if (score > highestScore)
 	{
 		CCUserDefault::sharedUserDefault()->
-		setIntegerForKey("highestScore", score);
+			setIntegerForKey("highestScore", score);
 		CCUserDefault::sharedUserDefault()->flush();
 		auto sprite = Sprite::create("thehighestscore.png");
 		sprite->setPosition(Vec2(kDesignResolutionWidth / 2, kDesignResolutionHeight / 2));
@@ -122,7 +136,7 @@ void GameOver::setScore(int score)
 		audio->playEffect("music/end_Steps.mp3", false);
 		this->addChild(sprite, 0);
 	}
-	
+
 }
 
 void GameOver::levelSelectBackCallback(Ref* pSender)
@@ -142,16 +156,16 @@ bool GameOver::touchBeganCallback(Touch* touch, Event* event)
 {
 	//Used to determine whether the control is in the point  
 	bool isClicked = textEdit->boundingBox().containsPoint(touch->getLocation());
-	
+
 	//if true  
 	if (isClicked) {
-		  
+
 		textEdit->attachWithIME();
 	}
 	else {
 		textEdit->detachWithIME();
 	}
-  
+
 	return true;
 }
 void GameOver::menuSubmitCallback(Ref* pSender)
@@ -192,7 +206,7 @@ void GameOver::menuSubmitCallback(Ref* pSender)
 		UD_setString(StringUtils::format("p%d_mode", i).c_str(), p[i - 1].mode);
 		CCUserDefault::sharedUserDefault()->flush();
 	}
-
+	popDialog( callfuncN_selector(GameOver::dialogButtonCallback));
 	// 这里，是用来测试的，忽略不计吧
 	CCLOG(p[0].name.c_str());
 	CCLOG("score:%d", p[0].score);
@@ -206,13 +220,55 @@ void GameOver::menuSubmitCallback(Ref* pSender)
 }
 void GameOver::setcurrentmode(int modetype)
 {
-	switch(modetype)
+	switch (modetype)
 	{
-		case 0:
+	case 0:
 		current_mode = "Steps";
 		break;
-		case 1:
+	case 1:
 		current_mode = "Times";
 		break;
-	}	
+	}
+}
+void GameOver::popDialog(SEL_CallFuncN callfunc)
+{
+	
+	auto visibleSize = Director::getInstance()->getVisibleSize();
+	_eventDispatcher->pauseEventListenersForTarget(this, true);
+	Dialog* dialog = Dialog::create();
+	dialog->setTitle("Try Again?", 45);
+	dialog->setBackground("button/DialogBackground.png");
+	dialog->addButton("button/BlankNormal.png", "button/BlankPressed.png", "Yes!", 1,
+		Vec2(visibleSize.width / 2, visibleSize.height / 2));
+	dialog->addButton("button/BlankNormal.png", "button/BlankPressed.png", "NO,Exit", 2,
+		Vec2(visibleSize.width / 2, visibleSize.height / 2 - 70));
+	dialog->setCallbackFunc(this, callfunc);
+	addChild(dialog, 3);
+}
+void GameOver::dialogButtonCallback(Node* pNode)
+{
+	CCASSERT(pNode != nullptr, "Node is a null pointer");
+	_eventDispatcher->resumeEventListenersForTarget(this, true);
+	int tag = pNode->getTag();
+	
+		if (tag == 1)
+		{
+			float percent = UD_getInt("musicPercent");
+			auto audio = CocosDenshion::SimpleAudioEngine::getInstance();
+			if (CCUserDefault::sharedUserDefault()->getIntegerForKey(MUSIC_KEY))
+			{
+				
+				audio->playBackgroundMusic("music/Olimpica.mp3", true);
+				audio->setBackgroundMusicVolume(percent / 100.0);
+				UD_setFloat("musicPercent", percent);
+			}
+			audio->playEffect("music/normalclick.mp3", false);
+			auto scene = LevelSelect::createScene();
+			Director::getInstance()->replaceScene(TransitionMoveInR::create(kTransitionTime, scene));
+		}
+		else
+		{
+			Director::getInstance()->end();
+		}
+
 }

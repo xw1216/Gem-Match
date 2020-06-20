@@ -7,15 +7,18 @@
 #include "GameOver.h"
 #include "GameDefine.h"
 #include "Sprite\SpriteShape.h"
+#include "ui/CocosGUI.h"
+
 
 USING_NS_CC;
+using namespace ui;
 
 class GameScene : public cocos2d::Scene
 {
 public:
 	typedef std::map <Point, SpriteShape* > BlockMap;
 	typedef std::pair<Point, SpriteShape*> BlockPair;
-	
+
 	// three game mode are designed 
 	// and could be selected in levelselect
 
@@ -27,7 +30,7 @@ public:
 	// initiallization related function
 	virtual bool init();
 	void initMap();
-	void createSprite(int row, int col,int index);
+	void createSprite(int row, int col, int index);
 	void initLimit();
 	void initScorer();
 
@@ -41,7 +44,7 @@ public:
 	// running blocks check
 	// check matchs and remove sprites
 	void checkAndRemove();
-	void markRemove  (SpriteShape* sprite) noexcept;
+	void markRemove(SpriteShape* sprite) noexcept;
 	void removeSprite();
 	void explodeSprite(SpriteShape* sprite);
 	void colCheck(SpriteShape* sprite, std::list< SpriteShape*>& colChain);
@@ -53,7 +56,7 @@ public:
 	// then check and process match
 	void swapSprite();
 	bool swapMatch();
-	void processMatch(std::list<SpriteShape*> 
+	void processMatch(std::list<SpriteShape*>
 		& matchList, SpriteStatus matchType);
 
 	// game design functions
@@ -62,6 +65,7 @@ public:
 	void pedometer();
 
 	// replace scene to gameover
+	void increase_diff(int diff);
 	void gameOver(float dt);
 	/*void rankList(float dt);*/
 
@@ -75,10 +79,10 @@ public:
 	SpriteShape* findSprite(int row, int col);
 	SpriteShape* findSprite(const Point& point);
 	int getDifficulty() noexcept { return m_difficulty; } const
-	void setDifficulty(int num) noexcept { m_difficulty = num; }
+		void setDifficulty(int num) noexcept { m_difficulty = num; }
 	void setBlockOriginPosition();
 	void  problemLoading(const char* filename) noexcept;
-	
+
 	// callbacks
 	void menuSettingCallback(Ref* pSender);
 	void menuHomeCallback(Ref* pSender);
@@ -87,7 +91,7 @@ public:
 	void actionEndCallback(Node* node);
 	bool touchBeganCallback(Touch* touch, Event* event);
 	void touchEndCallback(Touch* touch, Event* event);
-	
+
 	// protected varieble
 	CC_SYNTHESIZE(int, m_time, times);
 	CC_SYNTHESIZE(int, m_steps, steps);
@@ -100,7 +104,7 @@ private:
 	bool m_isFillSprite;
 	bool m_enableOperation;
 
-	
+
 	// game setting data
 	// user can customize them in the future
 	GameMode m_gamemode;

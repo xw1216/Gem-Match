@@ -28,19 +28,19 @@ bool LevelSelect::init()
 			background->setPosition(Vec2::ZERO);
 			this->addChild(background, -20);
 		}
-		
+
 		// add home menu
 		addButtonItem("icon/Home.png", Vec2(
 			visibleSize.width - kIconlength, kIconlength),
 			CC_CALLBACK_1(LevelSelect::menuBackCallback, this));
-		
+
 		// add different game mode start menu
 		auto clock = addButtonItem("icon/Clock.png", Vec2(
-			visibleSize.width / 2 -2*kIconlength, visibleSize.height / 2),
+			visibleSize.width / 2 - 2 * kIconlength, visibleSize.height / 2),
 			CC_CALLBACK_1(LevelSelect::timeModeCallback, this));
 		clock->setScale(1.5);
 		auto steps = addButtonItem("icon/Play.png", Vec2(
-			visibleSize.width / 2 , visibleSize.height / 2),
+			visibleSize.width / 2, visibleSize.height / 2),
 			CC_CALLBACK_1(LevelSelect::stepModeCallback, this));
 		steps->setScale(1.5);
 		auto times = addButtonItem("icon/Refresh.png", Vec2(
@@ -52,13 +52,13 @@ bool LevelSelect::init()
 		addButtonItem("icon/Menu.png", Vec2(
 			visibleSize.width / 2, visibleSize.height / 4),
 			CC_CALLBACK_1(LevelSelect::gameRankCallback, this));
-		
+
 		return true;
 	}
 }
 
-Menu* LevelSelect::addButtonItem(const char* image, Vec2 position, 
-	const ccMenuCallback &callback)
+Menu* LevelSelect::addButtonItem(const char* image, Vec2 position,
+	const ccMenuCallback& callback)
 {
 	auto menuItem = MenuItemImage::create(image, image, callback);
 	if (menuItem == nullptr)
@@ -76,7 +76,7 @@ Menu* LevelSelect::addButtonItem(const char* image, Vec2 position,
 void LevelSelect::popDialog(GameMode mode, SEL_CallFuncN callfunc)
 {
 	int tag = 0;
-	std::string title,firstButton, secondButton;
+	std::string title, firstButton, secondButton;
 	if (mode == Steps)
 	{
 		tag = 1;
@@ -97,13 +97,13 @@ void LevelSelect::popDialog(GameMode mode, SEL_CallFuncN callfunc)
 	dialog->setTitle(title.c_str(), 45);
 	dialog->setBackground("button/DialogBackground.png");
 	dialog->setContent("Easy or hard?", 35);
-	dialog->addButton("button/BlankNormal.png", "button/BlankPressed.png",firstButton,tag,
+	dialog->addButton("button/BlankNormal.png", "button/BlankPressed.png", firstButton.c_str(), tag,
 		Vec2(visibleSize.width / 2, visibleSize.height / 2));
-	dialog->addButton("button/BlankNormal.png", "button/BlankPressed.png",secondButton,tag+1,
+	dialog->addButton("button/BlankNormal.png", "button/BlankPressed.png", secondButton.c_str(), tag + 1,
 		Vec2(visibleSize.width / 2, visibleSize.height / 2 - 70));
 	dialog->addButton("button/BlankNormal.png", "button/BlankNormal.png", "Cancel", 0,
 		Vec2(visibleSize.width / 2, visibleSize.height / 2 - 140));
-	dialog->setCallbackFunc(this,callfunc);
+	dialog->setCallbackFunc(this, callfunc);
 	addChild(dialog, 3);
 }
 
@@ -112,7 +112,7 @@ void LevelSelect::menuBackCallback(Ref* pSender)
 	auto audio = CocosDenshion::SimpleAudioEngine::getInstance();
 	audio->playEffect("music/normalclick.mp3", false);
 	auto scene = HelloWorld::createScene();
-	Director::getInstance()->replaceScene(TransitionCrossFade::create(kTransitionTime,scene));
+	Director::getInstance()->replaceScene(TransitionCrossFade::create(kTransitionTime, scene));
 }
 
 void LevelSelect::gameRankCallback(Ref* pSender)
@@ -151,13 +151,13 @@ void LevelSelect::dialogButtonCallback(Node* pNode)
 		switch (tag)
 		{
 		case 1:
-			UD_setInt("Gamemode", Steps); UD_setInt("Steps", 20); break;
+			UD_setInt("Gamemode", Steps); UD_setInt("Steps", 20); UD_setInt("Goal", 10000); break;
 		case 2:
-			UD_setInt("Gamemode", Steps); UD_setInt("Steps", 15); break;
+			UD_setInt("Gamemode", Steps); UD_setInt("Steps", 15); UD_setInt("Goal", 20000); break;
 		case 3:
-			UD_setInt("Gamemode", Times); UD_setInt("Times", 60); break;
+			UD_setInt("Gamemode", Times); UD_setInt("Times", 60); UD_setInt("Goal", 5000); break;
 		case 4:
-			UD_setInt("Gamemode", Times); UD_setInt("Times", 90); break;
+			UD_setInt("Gamemode", Times); UD_setInt("Times", 90); UD_setInt("Goal", 10000); break;
 		default:
 			break;
 		}

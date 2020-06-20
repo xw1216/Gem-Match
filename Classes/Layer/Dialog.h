@@ -17,7 +17,7 @@ public:
 	virtual void onEnter();
 
 	bool addButton(const char* normalImage, const char* seletedImage,
-		std::string button_title, int tag, Vec2 position);
+		const char* button_title, int tag, Vec2 position);
 	bool addButton(const char* normalImage, const char* selectedImage,
 		int tag, Vec2 position);
 
