@@ -14,8 +14,7 @@ bool LevelSelect::init()
 	}
 	else
 	{
-		auto const visibleSize = Director::getInstance()->getVisibleSize();
-		Vec2 const origin = Director::getInstance()->getVisibleOrigin();
+
 
 		// add background
 		auto background = Sprite::create("Background.png");
@@ -25,32 +24,37 @@ bool LevelSelect::init()
 		}
 		else
 		{
-			background->setPosition(Vec2::ZERO);
+			background->setScale(m_scaleRatioX, m_scaleRatioY);
+			background->setPosition(Vec2(
+				m_visibleSize.width / 2 + m_origin.x,
+				m_visibleSize.height / 2 + m_origin.y));
 			this->addChild(background, -20);
 		}
 
 		// add home menu
 		addButtonItem("icon/Home.png", Vec2(
-			visibleSize.width - kIconlength, kIconlength),
+			m_origin.x + m_visibleSize.width - kIconlength,
+			m_origin.y + kIconlength),
 			CC_CALLBACK_1(LevelSelect::menuBackCallback, this));
 
 		// add different game mode start menu
 		auto clock = addButtonItem("icon/Clock.png", Vec2(
-			visibleSize.width / 2 - 2 * kIconlength, visibleSize.height / 2),
+			m_origin.x + m_visibleSize.width / 2 - 2 * m_scaleRatioX * kIconlength,
+			m_origin.y + m_visibleSize.height / 2),
 			CC_CALLBACK_1(LevelSelect::timeModeCallback, this));
-		clock->setScale(1.5);
 		auto steps = addButtonItem("icon/Play.png", Vec2(
-			visibleSize.width / 2, visibleSize.height / 2),
+			m_origin.x + m_visibleSize.width / 2,
+			m_origin.y + m_visibleSize.height / 2),
 			CC_CALLBACK_1(LevelSelect::stepModeCallback, this));
-		steps->setScale(1.5);
 		auto times = addButtonItem("icon/Refresh.png", Vec2(
-			visibleSize.width / 2 + 2 * kIconlength, visibleSize.height / 2),
+			m_origin.x + m_visibleSize.width / 2 + 2 * m_scaleRatioX * kIconlength,
+			m_origin.y + m_visibleSize.height / 2),
 			CC_CALLBACK_1(LevelSelect::creativeModeCallback, this));
-		times->setScale(1.5);
 
 		//add ranklist button
 		addButtonItem("icon/Menu.png", Vec2(
-			visibleSize.width / 2, visibleSize.height / 4),
+			m_origin.x + m_visibleSize.width / 2,
+			m_origin.y + m_visibleSize.height / 4),
 			CC_CALLBACK_1(LevelSelect::gameRankCallback, this));
 
 		return true;
@@ -62,9 +66,10 @@ Menu* LevelSelect::addButtonItem(const char* image, Vec2 position,
 {
 	auto menuItem = MenuItemImage::create(image, image, callback);
 	if (menuItem == nullptr)
-		assert("menu create failed");
+		assert("Menu create failed!");
 	else
 	{
+		menuItem->setScale(m_scaleRatioX, m_scaleRatioY);
 		menuItem->setPosition(position);
 		auto menu = Menu::create(menuItem, NULL);
 		menu->setPosition(Vec2::ZERO);
@@ -81,30 +86,38 @@ void LevelSelect::popDialog(GameMode mode, SEL_CallFuncN callfunc)
 	{
 		tag = 1;
 		title = "Step Mode";
-		firstButton = "Win 10000 pts in 20 steps";
-		secondButton = "Win 20000 pts in 15 steps";
+		firstButton = "More pts in 20 steps";
+		secondButton = "More pts in 15 steps";
 	}
 	else if (mode == Times)
 	{
 		tag = 3;
 		title = "Time Mode";
-		firstButton = "Win 5000 pts in 60s";
-		secondButton = "Win 10000 pts in 90s";
+		firstButton = "More pts in 60s";
+		secondButton = "More pts in 90s";
 	}
-	auto visibleSize = Director::getInstance()->getVisibleSize();
 	_eventDispatcher->pauseEventListenersForTarget(this, true);
 	Dialog* dialog = Dialog::create();
 	dialog->setTitle(title.c_str(), 45);
 	dialog->setBackground("button/DialogBackground.png");
 	dialog->setContent("Easy or hard?", 35);
 	dialog->addButton("button/BlankNormal.png", "button/BlankPressed.png", firstButton.c_str(), tag,
-		Vec2(visibleSize.width / 2, visibleSize.height / 2));
+		Vec2(m_visibleSize.width / 2, m_visibleSize.height / 2));
 	dialog->addButton("button/BlankNormal.png", "button/BlankPressed.png", secondButton.c_str(), tag + 1,
-		Vec2(visibleSize.width / 2, visibleSize.height / 2 - 70));
+		Vec2(m_visibleSize.width / 2, m_visibleSize.height / 2 - 70 * m_scaleRatioY));
 	dialog->addButton("button/BlankNormal.png", "button/BlankNormal.png", "Cancel", 0,
-		Vec2(visibleSize.width / 2, visibleSize.height / 2 - 140));
+		Vec2(m_visibleSize.width / 2, m_visibleSize.height / 2 - 140 * m_scaleRatioY));
 	dialog->setCallbackFunc(this, callfunc);
 	addChild(dialog, 3);
+}
+
+void LevelSelect::setResolutionScale()
+{
+	auto const winSize = CCDirector::sharedDirector()->getWinSize();
+	m_visibleSize = CCDirector::sharedDirector()->getVisibleSize();
+	m_origin = CCDirector::sharedDirector()->getVisibleOrigin();
+	m_scaleRatioX = winSize.width / kDesignResolutionWidth;
+	m_scaleRatioY = winSize.height / kDesignResolutionHeight;
 }
 
 void LevelSelect::menuBackCallback(Ref* pSender)
@@ -151,7 +164,7 @@ void LevelSelect::dialogButtonCallback(Node* pNode)
 		switch (tag)
 		{
 		case 1:
-			UD_setInt("Gamemode", Steps); UD_setInt("Steps", 20); UD_setInt("Goal", 10000); break;
+			UD_setInt("Gamemode", Steps); UD_setInt("Steps", 20); UD_setInt("Goal", 10000);  break;
 		case 2:
 			UD_setInt("Gamemode", Steps); UD_setInt("Steps", 15); UD_setInt("Goal", 20000); break;
 		case 3:

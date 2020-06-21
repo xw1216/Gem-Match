@@ -1,13 +1,13 @@
 #include "Dialog.h"
 
-Dialog::Dialog():
+Dialog::Dialog() :
 	m_title(nullptr),
 	m_content(nullptr),
 	m_titleFontSize(0),
 	m_contentFontSize(0),
 	m_callback(nullptr),
 	m_callbackLisner(nullptr),
-	m_size(0,0)
+	m_size(0, 0)
 {
 }
 
@@ -25,44 +25,47 @@ bool Dialog::init()
 	{
 		return false;
 	}
-	
+
+	setResolutionScale();
 	menu = Menu::create();
 	node = Vector<Node*>();
-	auto const visableSize = Director::getInstance()->getVisibleSize();
 	return true;
 }
 
 void Dialog::onEnter()
 {
 	Layer::onEnter();
-	auto const visableSize = Director::getInstance()->getVisibleSize();
 	background = Sprite::create(m_backgroundImage);
-	background->setPosition(visableSize.width / 2, visableSize.height / 2);
-	background->setScale(1.0f);
-	addChild(background, 1);
-	m_size = background->getContentSize();
-
+	if (background)
+	{
+		background->setPosition(m_visibleSize.width / 2, m_visibleSize.height / 2);
+		background->setScale(m_scaleRatioX, m_scaleRatioY);
+		addChild(background, 1);
+		m_size = background->getContentSize();
+	}
+	
 	for (const auto& singleNode : node)
 	{
 		addChild(singleNode, 2);
 	}
 	if (getTitle())
 	{
-		Label* title = Label::create(getTitle(), "", getTitleSize());
+		Label* title = Label::create(getTitle(), "fonts/FZCHSJW.ttf", getTitleSize() * m_scaleRatioX);
 		title->setColor(Color3B::BLACK);
-		title->setPosition(visableSize.width / 2, visableSize.height / 2 + 140);
+		title->setPosition(m_visibleSize.width / 2, m_visibleSize.height / 2 + 140 * m_scaleRatioY);
 		addChild(title, 1);
 	}
 	if (getContentLabel())
 	{
-		Label* content = Label::create(getContentLabel(), "", getContentFontSize());
+		Label* content = Label::create(getContentLabel(), 
+			"fonts/FZCHSJW.ttf", getContentFontSize() * m_scaleRatioX);
 		content->setColor(Color3B::BLACK);
-		content->setPosition(visableSize.width / 2, visableSize.height / 2 + 70);
+		content->setPosition(m_visibleSize.width / 2, m_visibleSize.height / 2 + 70 * m_scaleRatioY);
 		addChild(content, 1);
 	}
 
 	auto action = Spawn::createWithTwoActions(
-		ScaleTo::create(1.1,1.1), FadeIn::create(1));
+		ScaleTo::create(1.1, 1.1), FadeIn::create(0.5));
 	this->runAction(action);
 
 }
@@ -70,16 +73,18 @@ void Dialog::onEnter()
 bool Dialog::addButton(const char* normalImage, const char* selectedImage, const char* button_title, int tag, Vec2 position)
 {
 	MenuItemImage* menuImage = MenuItemImage::create(
-		normalImage, selectedImage, this, menu_selector(Dialog::buttonCallback));
+		normalImage, selectedImage, this, 
+		menu_selector(Dialog::buttonCallback));
+	menuImage->setScale(m_scaleRatioX, m_scaleRatioY);
 	menuImage->setTag(tag);
-	menuImage->setPosition(position);
 
 	CCSize const menuSize = menuImage->getContentSize();
-	LabelTTF* ttf = LabelTTF::create(button_title, "", 35);
+	LabelTTF* ttf = LabelTTF::create(button_title, "", 25 * m_scaleRatioX);
 	ttf->setColor(Color3B::BLACK);
 	ttf->setPosition(ccp(menuSize.width / 2, menuSize.height / 2));
 	menuImage->addChild(ttf);
 	Menu* menu = Menu::create(menuImage, NULL);
+	menu->setPosition(position);
 	node.pushBack(menu);
 	return true;
 }
@@ -87,7 +92,9 @@ bool Dialog::addButton(const char* normalImage, const char* selectedImage, const
 bool Dialog::addButton(const char* normalImage, const char* selectedImage, int tag, Vec2 position)
 {
 	MenuItemImage* menuImage = MenuItemImage::create(
-		normalImage, selectedImage, this, menu_selector(Dialog::buttonCallback));
+		normalImage, selectedImage, this, 
+		menu_selector(Dialog::buttonCallback));
+	menuImage->setScale(m_scaleRatioX, m_scaleRatioY);
 	menuImage->setTag(tag);
 	Menu* menu = Menu::create(menuImage, NULL);
 	menu->setPosition(position);
@@ -130,6 +137,15 @@ const char* Dialog::getContentLabel()
 int Dialog::getContentFontSize()
 {
 	return m_contentFontSize;
+}
+
+void Dialog::setResolutionScale()
+{
+	auto const winSize = CCDirector::sharedDirector()->getWinSize();
+	m_visibleSize = CCDirector::sharedDirector()->getVisibleSize();
+	m_origin = CCDirector::sharedDirector()->getVisibleOrigin();
+	m_scaleRatioX = winSize.width / kDesignResolutionWidth;
+	m_scaleRatioY = winSize.height / kDesignResolutionHeight;
 }
 
 void Dialog::setCallbackFunc(CCObject* target, SEL_CallFuncN callfun)

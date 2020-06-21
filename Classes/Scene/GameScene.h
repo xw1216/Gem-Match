@@ -2,16 +2,14 @@
 #define __GAME_SCENE__
 
 #include "cocos2d.h"
+#include "GameDefine.h"
+#include "ui/CocosGUI.h"
 #include "Layer/Dialog.h"
 #include "LevelSelect.h"
 #include "GameOver.h"
-#include "GameDefine.h"
 #include "Sprite\SpriteShape.h"
-#include "ui/CocosGUI.h"
-
 
 USING_NS_CC;
-using namespace ui;
 
 class GameScene : public cocos2d::Scene
 {
@@ -65,21 +63,21 @@ public:
 	void pedometer();
 
 	// replace scene to gameover
-	void increase_diff(int diff);
+	void increaseDiff(int diff);
 	void gameOver(float dt);
 	/*void rankList(float dt);*/
 
 	// impletation of the row or col clear sprite
-	void explodeHorizontal(SpriteShape* sprite);
-	void explodeVertical(SpriteShape* sprite);
-	void explodeGlobal(SpriteShape* sprite);
+	void explodeHorizontal(SpriteShape* const sprite);
+	void explodeVertical(SpriteShape* const sprite);
+	void explodeGlobal(SpriteShape* const sprite);
 
 	// set, get and find  functions
 	void setGameMode();
+	void setIndexRange();
+	void setResolutionScale();
 	SpriteShape* findSprite(int row, int col);
 	SpriteShape* findSprite(const Point& point);
-	int getDifficulty() noexcept { return m_difficulty; } const
-		void setDifficulty(int num) noexcept { m_difficulty = num; }
 	void setBlockOriginPosition();
 	void  problemLoading(const char* filename) noexcept;
 
@@ -104,11 +102,14 @@ private:
 	bool m_isFillSprite;
 	bool m_enableOperation;
 
+	Vec2 m_origin;
+	Size m_visibleSize;
+	float m_scaleRatioX, m_scaleRatioY;
 
 	// game setting data
 	// user can customize them in the future
 	GameMode m_gamemode;
-	int m_difficulty;
+	int m_startIndex, m_endIndex;
 	int m_score;
 
 	// data to identify the swap and special sprites

@@ -6,6 +6,8 @@
 #define SOUND_KEY "sound_key"
 #define MUSIC_KEY "music_key"
 
+USING_NS_CC;
+
 // The default resolution of the game
 constexpr int kDesignResolutionWidth = 540;
 constexpr int kDesignResolutionHeight = 960;

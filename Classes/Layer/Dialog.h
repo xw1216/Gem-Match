@@ -2,6 +2,7 @@
 #define __DIALOG_H__
 
 #include "cocos2d.h"
+#include "GameDefine.h"
 
 USING_NS_CC;
 
@@ -31,6 +32,7 @@ public:
 	const char* getContentLabel();
 	int getContentFontSize();
 
+	void setResolutionScale();
 	void setCallbackFunc(CCObject* target, SEL_CallFuncN callfun);
 	void buttonCallback(Ref* pSender);
 
@@ -48,6 +50,10 @@ private:
 	int m_contentFontSize;
 	Sprite* m_sprite;
 	const char* m_backgroundImage;
+	Vec2 m_origin;
+	Size m_visibleSize;
+	float m_scaleRatioX, m_scaleRatioY;
+
 };
 
 #endif // !__DIALOG_H__
