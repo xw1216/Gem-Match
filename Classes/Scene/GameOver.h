@@ -27,7 +27,7 @@ public:
 
 	void setScore(int score);
 	void getScore(int score) { finalScore = score; };
-	void setcurrentmode(int modetyoe);
+	void setcurrentmode(int modetype);
 	void setResolutionScale();
 	void popDialog(SEL_CallFuncN callfunc);
 	void dialogButtonCallback(Node* pNode);

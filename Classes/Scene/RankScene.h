@@ -3,6 +3,7 @@
 
 #include "cocos2d.h"
 #include "GameDefine.h"
+#include "LevelSelect.h"
 
 USING_NS_CC;
 
@@ -14,6 +15,7 @@ public:
 	CREATE_FUNC(RankScene);
 
 	virtual bool init();
+	void setResolutionScale();
 
 	/*void menuCloseCallback(cocos2d::Ref* pSender);
 	void menuSettingCallback(cocos2d::Ref* pSender);*/
@@ -23,7 +25,10 @@ public:
 	{
 		printf("Error while loading: %s\n", filename);
 	}
-
+private:
+	Vec2 m_origin;
+	Size m_visibleSize;
+	float m_scaleRatioX, m_scaleRatioY;
 };
 #endif //_RANK_SCENE_
 

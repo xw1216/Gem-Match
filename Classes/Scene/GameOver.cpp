@@ -23,7 +23,9 @@ bool GameOver::init()
 		else
 		{
 			background->setScale(m_scaleRatioX, m_scaleRatioY);
-			background->setPosition(Vec2::ZERO);
+			background->setPosition(Vec2(
+				m_visibleSize.width / 2 + m_origin.x,
+				m_visibleSize.height / 2 + m_origin.y));
 			this->addChild(background, -20);
 		}
 
@@ -57,7 +59,7 @@ bool GameOver::init()
 		auto gameover = Sprite::create("image/GameOverA.png");
 		if (gameover == nullptr)
 		{
-			problemLoading("Background.png");
+			problemLoading("image/GameOverA.png");
 		}
 		else
 		{
@@ -67,7 +69,6 @@ bool GameOver::init()
 				m_visibleSize.height/2));
 			this->addChild(gameover, -20);
 		}
-
 
 		//add Summit button
 		auto startItem = MenuItemImage::create(
@@ -128,6 +129,7 @@ bool GameOver::init()
 			}
 		}
 	}
+	return true;
 }
 
 void GameOver::setScore(int score)
@@ -165,6 +167,7 @@ void GameOver::setScore(int score)
 void GameOver::levelSelectBackCallback(Ref* pSender)
 {
 	auto scene = LevelSelect::createScene();
+	this->removeFromParent();
 	Director::getInstance()->replaceScene(
 		TransitionCrossFade::create(kTransitionTime, scene));
 }
@@ -172,6 +175,7 @@ void GameOver::levelSelectBackCallback(Ref* pSender)
 void GameOver::gameStartCallback(Ref* pSender)
 {
 	auto scene = GameScene::createScene();
+	this->removeFromParent();
 	Director::getInstance()->replaceScene(
 		TransitionCrossFade::create(kTransitionTime, scene));
 }
@@ -230,7 +234,6 @@ void GameOver::menuSubmitCallback(Ref* pSender)
 		UD_setString(StringUtils::format("p%d_mode", i).c_str(), p[i - 1].mode);
 		CCUserDefault::sharedUserDefault()->flush();
 	}
-
 	popDialog(callfuncN_selector(GameOver::dialogButtonCallback));
 }
 
@@ -289,6 +292,7 @@ void GameOver::dialogButtonCallback(Node* pNode)
 		}
 		audio->playEffect("music/normalclick.mp3", false);
 		auto scene = LevelSelect::createScene();
+		this->removeFromParent();
 		Director::getInstance()->replaceScene(TransitionMoveInR::create(kTransitionTime, scene));
 	}
 	else

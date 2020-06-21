@@ -125,6 +125,7 @@ void LevelSelect::menuBackCallback(Ref* pSender)
 	auto audio = CocosDenshion::SimpleAudioEngine::getInstance();
 	audio->playEffect("music/normalclick.mp3", false);
 	auto scene = HelloWorld::createScene();
+	this->removeFromParent();
 	Director::getInstance()->replaceScene(TransitionCrossFade::create(kTransitionTime, scene));
 }
 
@@ -133,6 +134,7 @@ void LevelSelect::gameRankCallback(Ref* pSender)
 	auto audio = CocosDenshion::SimpleAudioEngine::getInstance();
 	audio->playEffect("music/normalclick.mp3", false);
 	auto scene = RankScene::createScene();
+	this->removeFromParent();
 	Director::getInstance()->pushScene(TransitionCrossFade::create(kTransitionTime, scene));
 }
 
@@ -150,6 +152,7 @@ void LevelSelect::creativeModeCallback(Ref* pSender)
 {
 	UD_setInt("Gamemode", Creative);
 	auto scene = GameScene::createScene();
+	this->removeFromParent();
 	Director::getInstance()->replaceScene(
 		TransitionCrossFade::create(kTransitionTime, scene));
 }
@@ -175,6 +178,7 @@ void LevelSelect::dialogButtonCallback(Node* pNode)
 			break;
 		}
 		auto scene = GameScene::createScene();
+		this->removeFromParent();
 		Director::getInstance()->replaceScene(
 			TransitionCrossFade::create(kTransitionTime, scene));
 	}
