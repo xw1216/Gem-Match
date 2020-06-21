@@ -14,11 +14,9 @@ bool RankScene::init()
 	{
 		return false;
 	}
-
-	auto const visibleSize = Director::getInstance()->getVisibleSize();
-	Vec2 const origin = Director::getInstance()->getVisibleOrigin();
-	TTFConfig config("fonts/FZCHSJW.ttf", 20);
-	//add background
+	
+	setResolutionScale();
+	// add background
 	auto background = Sprite::create("Background.png");
 	if (background == nullptr)
 	{
@@ -26,9 +24,17 @@ bool RankScene::init()
 	}
 	else
 	{
-		background->setPosition(Vec2(kDesignResolutionWidth / 2, kDesignResolutionHeight / 2));
+		background->setScale(m_scaleRatioX, m_scaleRatioY);
+		background->setPosition(Vec2(
+			m_visibleSize.width / 2 + m_origin.x,
+			m_visibleSize.height / 2 + m_origin.y));
 		this->addChild(background, -20);
 	}
+
+	auto const visibleSize = Director::getInstance()->getVisibleSize();
+	Vec2 const origin = Director::getInstance()->getVisibleOrigin();
+	TTFConfig config("fonts/FZCHSJW.ttf", 20);
+
 	//add back buttton
 	auto backItem = MenuItemImage::create(
 		"icon/Back.png", "icon/Back.png",
@@ -49,7 +55,7 @@ bool RankScene::init()
 	auto label_fir = Label::createWithTTF("Highest!", "fonts/FZCHSJW.ttf", 35);
 	if (label_fir == nullptr)
 	{
-		problemLoading("'fonts/arial.ttf'");
+		problemLoading("fonts/FZCHSJW.ttf");
 	}
 	else
 	{
@@ -68,7 +74,7 @@ bool RankScene::init()
 	int fir_score = UD_getInt("p1_score");
 	if (fir_mode == "Steps")
 	{
-		CCLOG("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB");
+		CCLOG("B name");
 	}
 
 
@@ -101,12 +107,6 @@ bool RankScene::init()
 		origin.y + visibleSize.height - 4 * (label_fir->getContentSize().height) - 10));
 	this->addChild(fir_Lable_score);
 
-
-
-
-
-
-
 	auto label_sec = Label::createWithTTF("Second!", "fonts/FZCHSJW.ttf", 35);
 	if (label_sec == nullptr)
 	{
@@ -130,7 +130,7 @@ bool RankScene::init()
 
 	if (sec_m == "Steps")
 	{
-		CCLOG("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+		CCLOG("A name");
 	}
 	cocos2d::Label* sec_Lable_name = nullptr;
 	sec_Lable_name = Label::createWithTTF(
@@ -213,11 +213,22 @@ bool RankScene::init()
 	thi_Lable_score->setPosition(Vec2(origin.x + 2 * visibleSize.width / 3,
 		origin.y + visibleSize.height - 16 * (label_fir->getContentSize().height) - 10));
 	this->addChild(thi_Lable_score);
-
+	
+	return true;
+}
+void RankScene::setResolutionScale()
+{
+	auto const winSize = CCDirector::sharedDirector()->getWinSize();
+	m_visibleSize = CCDirector::sharedDirector()->getVisibleSize();
+	m_origin = CCDirector::sharedDirector()->getVisibleOrigin();
+	m_scaleRatioX = winSize.width / kDesignResolutionWidth;
+	m_scaleRatioY = winSize.height / kDesignResolutionHeight;
 }
 void RankScene::menuBackCallback(cocos2d::Ref* pSender)
 {
 	auto audio = CocosDenshion::SimpleAudioEngine::getInstance();
 	audio->playEffect("music/normalclick.mp3", false);
-	Director::getInstance()->popScene();
+	auto scene = LevelSelect::createScene();
+	this->removeFromParent();
+	Director::getInstance()->replaceScene(scene);
 }
