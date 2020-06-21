@@ -1,8 +1,11 @@
 #include "HelloWorldScene.h"
 
-
 USING_NS_CC;
 
+HelloWorld::HelloWorld()
+{
+    setResolutionScale();
+}
 
 Scene* HelloWorld::createScene()
 {
@@ -13,30 +16,23 @@ bool HelloWorld::init()
 {
 
     // initailize the father class.
-    if ( !Scene::init() )
+    if (!Scene::init())
     {
         return false;
     }
 
-	auto const visibleSize = Director::getInstance()->getVisibleSize();
-	Vec2 const origin = Director::getInstance()->getVisibleOrigin();
-
-
-	if (CCUserDefault::sharedUserDefault()->getIntegerForKey(MUSIC_KEY))
-	{
-		float percent = UD_getInt("musicPercent");
-		auto audio = CocosDenshion::SimpleAudioEngine::getInstance();
-		audio->playBackgroundMusic("music/Olimpica.mp3", true);
-		audio->setBackgroundMusicVolume(percent/100.0);
-		UD_setFloat("musicPercent", percent);
-	}
-
-
+    if (CCUserDefault::sharedUserDefault()->getIntegerForKey(MUSIC_KEY))
+    {
+        float percent = UD_getInt("musicPercent");
+        auto audio = CocosDenshion::SimpleAudioEngine::getInstance();
+        audio->playBackgroundMusic("music/Olimpica.mp3", true);
+        audio->setBackgroundMusicVolume(percent / 100.0);
+        UD_setFloat("musicPercent", percent);
+    }
 
     // add a "close" icon to exit the progress. it's an autorelease object
     auto closeItem = MenuItemImage::create(
-        "icon/PowerNormal.png",
-        "icon/PowerSelected.png",
+        "icon/Power.png", "icon/Power.png",
         CC_CALLBACK_1(HelloWorld::menuCloseCallback, this));
 
     if (closeItem == nullptr ||
@@ -47,9 +43,10 @@ bool HelloWorld::init()
     }
     else
     {
-       float const x = origin.x + visibleSize.width - closeItem->getContentSize().width/2;
-       float const y = origin.y + closeItem->getContentSize().height/2;
-       closeItem->setPosition(Vec2(x,y));
+        closeItem->setScale(m_scaleRatioX, m_scaleRatioY);
+        closeItem->setPosition(Vec2(
+            m_origin.x + m_visibleSize.width - closeItem->getContentSize().width,
+            m_origin.y + closeItem->getContentSize().height));
     }
 
     // create menu, it's an autorelease object
@@ -71,8 +68,9 @@ bool HelloWorld::init()
     }
     else
     {
-        float const x = origin.x + visibleSize.width / 2;
-        float const y = origin.y + visibleSize.height / 5;
+        startItem->setScale(m_scaleRatioX, m_scaleRatioY);
+        float const x = m_origin.x + m_visibleSize.width / 2;
+        float const y = m_origin.y + m_visibleSize.height / 5;
         startItem->setPosition(Vec2(x, y));
     }
 
@@ -88,25 +86,29 @@ bool HelloWorld::init()
     }
     else
     {
-        label->setPosition(Vec2(origin.x + visibleSize.width/2,
-                                origin.y + visibleSize.height - 4*(label->getContentSize().height )));
-        label->setColor(Color3B::Color3B(89, 91, 179));
+        label->setScale(m_scaleRatioX, m_scaleRatioY);
+        label->setPosition(Vec2(m_origin.x + m_visibleSize.width / 2,
+            m_origin.y + m_visibleSize.height - 4 * (label->getContentSize().height)));
+        label->setColor(Color3B::BLACK);
 
         // add the label as a child to this layer
         this->addChild(label, 1);
     }
 
-	//add background
-	auto HelloBack = Sprite::create("background.png");
-	if (HelloBack == nullptr)
-	{
-		problemLoading("background.png");
-	}
-	else
-	{
-		HelloBack->setPosition(Vec2(kDesignResolutionWidth / 2, kDesignResolutionHeight / 2));
-		this->addChild(HelloBack, -20);
-	}
+    //add background
+    auto background = Sprite::create("Background.png");
+    if (background == nullptr)
+    {
+        problemLoading("Background.png");
+    }
+    else
+    {
+        background->setScale(m_scaleRatioX, m_scaleRatioY);
+        background->setPosition(Vec2(
+            m_visibleSize.width / 2 + m_origin.x,
+            m_visibleSize.height / 2 + m_origin.y));
+        this->addChild(background, -20);
+    }
 
     // add a logo on the center.
     auto sprite = Sprite::create("HelloWorld.png");
@@ -119,44 +121,56 @@ bool HelloWorld::init()
         // position the sprite on the center of the screen
         auto delay = DelayTime::create(kTransitionTime);
         auto dwindle = ScaleBy::create(1, 0.25f, 0.25f);
-        sprite->setPosition(Vec2(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y));
-        auto seq = Sequence::create(delay, dwindle,nullptr);
+        sprite->setScale(m_scaleRatioX, m_scaleRatioY);
+        sprite->setPosition(Vec2(
+            m_visibleSize.width / 2 + m_origin.x,
+            m_visibleSize.height / 2 + m_origin.y));
+        auto seq = Sequence::create(delay, dwindle, nullptr);
         sprite->runAction(seq);
-
         this->addChild(sprite, 0);
     }
 
-	//add settin button
-	auto settingItem = MenuItemImage::create(
-		"icon/setting.png", "icon/setting.png",
-		CC_CALLBACK_1(HelloWorld::menuSettingCallback, this));
-	if (settingItem == nullptr)
-		problemLoading("'icon/setting.png', 'icon/setting.png'");
-	else
-	{
-		float const x = settingItem->getContentSize().width;
-		float const y = origin.y + settingItem->getContentSize().height;
-		settingItem->setPosition(Vec2(x, y));
-		auto homeMenu = Menu::create(settingItem, NULL);
-		homeMenu->setPosition(Vec2::ZERO);
-		this->addChild(homeMenu, 1);
-	}
+    //add setting button
+    auto settingItem = MenuItemImage::create(
+        "icon/Setting.png", "icon/Setting.png",
+        CC_CALLBACK_1(HelloWorld::menuSettingCallback, this));
+    if (settingItem == nullptr)
+        problemLoading("'icon/Setting.png', 'icon/Setting.png'");
+    else
+    {
+        settingItem->setScale(m_scaleRatioX, m_scaleRatioY);
+        float const x = m_origin.x + settingItem->getContentSize().width;
+        float const y = m_origin.y + settingItem->getContentSize().height;
+        settingItem->setPosition(Vec2(x, y));
+        auto homeMenu = Menu::create(settingItem, NULL);
+        homeMenu->setPosition(Vec2::ZERO);
+        this->addChild(homeMenu, 1);
+    }
     return true;
+}
+
+void HelloWorld::setResolutionScale()
+{
+    auto const winSize = CCDirector::sharedDirector()->getWinSize();
+    m_visibleSize = CCDirector::sharedDirector()->getVisibleSize();
+    m_origin = CCDirector::sharedDirector()->getVisibleOrigin();
+    m_scaleRatioX = winSize.width / kDesignResolutionWidth;
+    m_scaleRatioY = winSize.height / kDesignResolutionHeight;
 }
 
 
 void HelloWorld::menuStartCallback(Ref* pSender)
 {
-	auto audio = CocosDenshion::SimpleAudioEngine::getInstance();
-	audio->playEffect("music/normalclick.mp3", false);
+    auto audio = CocosDenshion::SimpleAudioEngine::getInstance();
+    audio->playEffect("music/normalclick.mp3", false);
     auto scene = LevelSelect::createScene();
     Director::getInstance()->replaceScene(TransitionMoveInR::create(kTransitionTime, scene));
 }
 
 void HelloWorld::menuCloseCallback(Ref* pSender)
 {
-	auto audio = CocosDenshion::SimpleAudioEngine::getInstance();
-	audio->playEffect("music/normalclick.mp3", false);
+    auto audio = CocosDenshion::SimpleAudioEngine::getInstance();
+    audio->playEffect("music/normalclick.mp3", false);
     //Close the cocos2d-x game scene and quit the application
     Director::getInstance()->end();
 
@@ -167,9 +181,9 @@ void HelloWorld::menuCloseCallback(Ref* pSender)
 }
 void HelloWorld::menuSettingCallback(cocos2d::Ref* pSender)
 {
-	auto audio = CocosDenshion::SimpleAudioEngine::getInstance();
-	audio->playEffect("music/normalclick.mp3", false);
-	auto scene = SettingScene::createScene();
-	Director::getInstance()->pushScene(TransitionMoveInR::create(kTransitionTime, scene));
+    auto audio = CocosDenshion::SimpleAudioEngine::getInstance();
+    audio->playEffect("music/normalclick.mp3", false);
+    auto scene = SettingScene::createScene();
+    Director::getInstance()->pushScene(TransitionMoveInR::create(kTransitionTime, scene));
 
 }

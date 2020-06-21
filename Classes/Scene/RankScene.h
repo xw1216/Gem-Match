@@ -1,10 +1,12 @@
 #ifndef _RANK_SCENE_
 #define _RANK_SCENE_
+
 #include "cocos2d.h"
+#include "GameDefine.h"
 
 USING_NS_CC;
 
-class RankScene:public cocos2d::Scene
+class RankScene :public cocos2d::Scene
 {
 public:
 	static cocos2d::Scene* createScene();
@@ -12,9 +14,6 @@ public:
 	CREATE_FUNC(RankScene);
 
 	virtual bool init();
-
-
-	// selector callback
 
 	/*void menuCloseCallback(cocos2d::Ref* pSender);
 	void menuSettingCallback(cocos2d::Ref* pSender);*/

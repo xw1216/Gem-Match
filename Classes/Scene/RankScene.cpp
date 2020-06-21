@@ -1,6 +1,5 @@
 #include "RankScene.h"
-#include "GameDefine.h"
-#include <string>
+
 
 USING_NS_CC;
 
@@ -56,7 +55,7 @@ bool RankScene::init()
 	{
 		label_fir->setPosition(Vec2(origin.x + visibleSize.width / 3,
 			origin.y + visibleSize.height - 4 * (label_fir->getContentSize().height)));
-		label_fir->setColor(Color3B::Color3B(0,0,0));
+		label_fir->setColor(Color3B::BLACK);
 
 		// add the label as a child to this layer
 		this->addChild(label_fir, 1);
@@ -66,7 +65,7 @@ bool RankScene::init()
 	const char* fir_n = fir_name.c_str();
 	std::string fir_mode = UD_getString("p1_mode");
 	const char* fir_m = fir_mode.c_str();
-	int fir_score=UD_getInt("p1_score");
+	int fir_score = UD_getInt("p1_score");
 	if (fir_mode == "Steps")
 	{
 		CCLOG("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB");
@@ -93,13 +92,13 @@ bool RankScene::init()
 
 	fir_Lable_name->setColor(Color3B::BLACK);
 	fir_Lable_name->setPosition(Vec2(origin.x + 2 * visibleSize.width / 3,
-		origin.y + visibleSize.height - 4 * (label_fir->getContentSize().height)+10));
+		origin.y + visibleSize.height - 4 * (label_fir->getContentSize().height) + 10));
 	this->addChild(fir_Lable_name);
 
 
 	fir_Lable_score->setColor(Color3B::BLACK);
 	fir_Lable_score->setPosition(Vec2(origin.x + 2 * visibleSize.width / 3,
-		origin.y + visibleSize.height - 4 * (label_fir->getContentSize().height)-10));
+		origin.y + visibleSize.height - 4 * (label_fir->getContentSize().height) - 10));
 	this->addChild(fir_Lable_score);
 
 
@@ -117,7 +116,7 @@ bool RankScene::init()
 	{
 		label_sec->setPosition(Vec2(origin.x + visibleSize.width / 3,
 			origin.y + visibleSize.height - 10 * (label_sec->getContentSize().height)));
-		label_sec->setColor(Color3B::Color3B(0,0,0));
+		label_sec->setColor(Color3B::BLACK);
 
 		// add the label as a child to this layer
 		this->addChild(label_sec, 1);
@@ -160,7 +159,7 @@ bool RankScene::init()
 
 	sec_Lable_score->setColor(Color3B::BLACK);
 	sec_Lable_score->setPosition(Vec2(origin.x + 2 * visibleSize.width / 3,
-		origin.y + visibleSize.height - 10 * (label_fir->getContentSize().height) -10));
+		origin.y + visibleSize.height - 10 * (label_fir->getContentSize().height) - 10));
 	this->addChild(sec_Lable_score);
 
 
@@ -173,7 +172,7 @@ bool RankScene::init()
 	{
 		label_thi->setPosition(Vec2(origin.x + visibleSize.width / 3,
 			origin.y + visibleSize.height - 16 * (label_thi->getContentSize().height)));
-		label_thi->setColor(Color3B::Color3B(0,0,0));
+		label_thi->setColor(Color3B::BLACK);
 
 		// add the label as a child to this layer
 		this->addChild(label_thi, 1);
