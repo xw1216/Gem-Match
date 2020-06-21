@@ -15,6 +15,7 @@ bool SettingScene::init()
 	{
 		setResolutionScale();
 		addGroupSelect();
+
 		// add background
 		auto background = Sprite::create("Background.png");
 		if (background == nullptr)
@@ -24,7 +25,9 @@ bool SettingScene::init()
 		else
 		{
 			background->setScale(m_scaleRatioX, m_scaleRatioY);
-			background->setPosition(Vec2::ZERO);
+			background->setPosition(Vec2(
+				m_visibleSize.width / 2 + m_origin.x,
+				m_visibleSize.height / 2 + m_origin.y));
 			this->addChild(background, -20);
 		}
 
@@ -177,20 +180,28 @@ void SettingScene::addGroupSelect()
 	label->setColor(Color3B::BLACK);
 	this->addChild(label);
 
+	auto content = Label::create("(Useless while gaming)", "fonts/FZCHSJW.ttf", 25);
+	content->setPosition(Vec2(
+		m_visibleSize.width / 2,
+		m_visibleSize.height / 2 - label->getContentSize().height - content->getContentSize().height));
+	content->setColor(Color3B::BLACK);
+	this->addChild(content);
+
+
 	auto aGroup = MenuItemImage::create("button/BlockC.png", "button/BlockC.png", 
 		CC_CALLBACK_1(SettingScene::groupASelectCallback, this));
 	aGroup->setPosition(Vec2(
 		m_visibleSize.width / 2 - kSpriteWidth * 1.5,
-		m_visibleSize.height / 2 - kSpriteHeight * 1.5));
+		m_visibleSize.height / 2 - kSpriteHeight * 1.8));
 	auto bGroup = MenuItemImage::create("button/BlockG.png", "button/BlockG.png",
 		CC_CALLBACK_1(SettingScene::groupBSelectCallback, this));
 	bGroup->setPosition(Vec2(m_visibleSize.width / 2,
-		m_visibleSize.height / 2 - kSpriteHeight * 1.5));
+		m_visibleSize.height / 2 - kSpriteHeight * 1.8));
 	auto cGroup = MenuItemImage::create("button/BlockK.png", "button/BlockK.png",
 		CC_CALLBACK_1(SettingScene::groupCSelectCallback, this));
 	cGroup->setPosition(Vec2(
 		m_visibleSize.width / 2 + kSpriteWidth * 1.5,
-		m_visibleSize.height / 2 - kSpriteHeight * 1.5));
+		m_visibleSize.height / 2 - kSpriteHeight * 1.8));
 	auto menu = Menu::create(aGroup, bGroup, cGroup, NULL);
 	menu->setPosition(Vec2::ZERO);
 	this->addChild(menu, 2);

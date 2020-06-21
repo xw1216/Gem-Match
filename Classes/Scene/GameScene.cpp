@@ -661,7 +661,7 @@ void GameScene::timer(float dt)
 	else
 	{
 		limit->setScale(0);
-		auto gameover = Sprite::create("GameOverA.png");
+		auto gameover = Sprite::create("image/GameOverA.png");
 		gameover->setPosition(
 			m_origin.x + m_visibleSize.width / 2,
 			m_origin.y + m_visibleSize.height * 1.2);
@@ -733,6 +733,7 @@ void GameScene::increaseDiff(int diff)
 	UD_setInt("gamediff", diff + 1);
 	UD_setInt("Goal", m_goal + 2000);
 	auto scene = GameScene::create();
+	this->removeFromParent();
 	Director::getInstance()->replaceScene(
 		TransitionCrossFade::create(kTransitionTime, scene));
 }
@@ -741,6 +742,7 @@ void GameScene::increaseDiff(int diff)
 void GameScene::gameOver(float dt)
 {
 	auto scene = GameOver::createScene();
+	this->removeFromParent();
 	Director::getInstance()->replaceScene(
 		TransitionMoveInR::create(kTransitionTime, scene));
 }
@@ -980,6 +982,7 @@ void GameScene::menuHomeCallback(Ref* pSender)
 	auto audio = CocosDenshion::SimpleAudioEngine::getInstance();
 	audio->playEffect("music/normalclick.mp3", false);
 	auto scene = HelloWorld::createScene();
+	this->removeFromParent();
 	Director::getInstance()->replaceScene(scene);
 }
 
